@@ -1,0 +1,31 @@
+{
+  "name": "univen-chat-server",
+  "version": "1.0.0",
+  "description": "UNIVEN Chat Backend Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "chat",
+    "univen",
+    "social"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@huggingface/inference": "^4.13.15",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.0",
+    "express": "^4.18.2",
+    "groq-sdk": "^1.1.2",
+    "mammoth": "^1.12.0",
+    "mongoose": "^8.0.3",
+    "multer": "^2.1.1",
+    "pdf-parse": "^2.4.5",
+    "socket.io": "^4.6.1",
+    "tesseract.js": "^7.0.0"
+  }
+}

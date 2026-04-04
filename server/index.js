@@ -34,7 +34,7 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const storage = multer.memoryStorage();
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 20 * 1024 * 1024 } // 20MB limit
+  limits: { fileSize: 20 * 1024 * 1024 }
 });
 
 // Connect to MongoDB
@@ -66,7 +66,6 @@ app.post('/api/login', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// === SET FOUNDER ROLE (Run ONCE) ===
 app.post('/api/set-founder', async (req, res) => {
   try {
     const { username } = req.body;
@@ -193,12 +192,12 @@ app.post('/api/exam-threads/:id/reply', async (req, res) => { try { const { auth
 // === CAMPUS CONNECTIONS ENDPOINTS ===
 app.get('/api/connections', async (req, res) => { try { const profiles = await ConnectionProfile.find().populate('user', 'username displayName avatar'); res.json(profiles); } catch (error) { res.status(500).json({ error: error.message }); } });
 app.post('/api/connections/profile', async (req, res) => { try { const { userId, username, displayName, age, faculty, bio, photos, interests, campusHotspots, lookingFor, music, hobbies } = req.body; let profile = await ConnectionProfile.findOneAndUpdate({ user: userId }, { userId, username, displayName, age, faculty, bio, photos, interests, campusHotspots, lookingFor, music, hobbies }, { upsert: true, new: true }); res.json(profile); } catch (error) { res.status(500).json({ error: error.message }); } });
-app.post('/api/connections/like', async (req, res) => { try { const { likerId, likedId } = req.body; const existing = await ConnectionLike.findOne({ liker: likerId, liked: likedId }); if (existing) return res.json({ match: false, message: 'Already liked' }); const like = new ConnectionLike({ liker: likerId, liked: likedId }); await like.save(); const mutualLike = await ConnectionLike.findOne({ liker: likedId, liked: likerId }); if (mutualLike) { await ConnectionLike.findByIdAndUpdate(existing._id, { status: 'matched' }); await ConnectionLike.findByIdAndUpdate(mutualLike._id, { status: 'matched' }); const match = new ConnectionMatch({ user1: likerId, user2: likedId }); await match.save(); res.json({ match: true, message: 'It\'s a Match! 💕' }); } else { res.json({ match: false, message: 'Liked!' }); } } catch (error) { res.status(500).json({ error: error.message }); } });
+app.post('/api/connections/like', async (req, res) => { try { const { likerId, likedId } = req.body; const existing = await ConnectionLike.findOne({ liker: likerId, liked: likedId }); if (existing) return res.json({ match: false, message: 'Already liked' }); const like = new ConnectionLike({ liker: likerId, liked: likedId }); await like.save(); const mutualLike = await ConnectionLike.findOne({ liker: likedId, liked: likerId }); if (mutualLike) { await ConnectionLike.findByIdAndUpdate(existing._id, { status: 'matched' }); await ConnectionLike.findByIdAndUpdate(mutualLike._id, { status: 'matched' }); const match = new ConnectionMatch({ user1: likerId, user2: likedId }); await match.save(); res.json({ match: true, message: "It's a Match! 💕" }); } else { res.json({ match: false, message: 'Liked!' }); } } catch (error) { res.status(500).json({ error: error.message }); } });
 app.post('/api/connections/pass', async (req, res) => { try { const { passerId, passedId } = req.body; const pass = new ConnectionLike({ liker: passerId, liked: passedId, status: 'passed' }); await pass.save(); res.json({ message: 'Passed' }); } catch (error) { res.status(500).json({ error: error.message }); } });
 app.get('/api/connections/matches/:userId', async (req, res) => { try { const matches = await ConnectionMatch.find({ $or: [{ user1: req.params.userId }, { user2: req.params.userId }] }).populate('user1', 'username displayName avatar').populate('user2', 'username displayName avatar'); res.json(matches); } catch (error) { res.status(500).json({ error: error.message }); } });
 app.get('/api/connections/compatibility/:userId1/:userId2', async (req, res) => { try { const profile1 = await ConnectionProfile.findOne({ user: req.params.userId1 }); const profile2 = await ConnectionProfile.findOne({ user: req.params.userId2 }); if (!profile1 || !profile2) return res.json({ score: 0, common: [] }); const commonInterests = profile1.interests.filter(i => profile2.interests.includes(i)); const commonMusic = profile1.music.filter(m => profile2.music.includes(m)); const commonHotspots = profile1.campusHotspots.filter(h => profile2.campusHotspots.includes(h)); const totalCommon = commonInterests.length + commonMusic.length + commonHotspots.length; const score = Math.min(100, Math.round((totalCommon / 10) * 100)); res.json({ score, common: { interests: commonInterests, music: commonMusic, hotspots: commonHotspots } }); } catch (error) { res.status(500).json({ error: error.message }); } });
 
-// === STUDY GUIDE UPLOAD ENDPOINTS (WITH SIMPLE PDF HANDLING) ===
+// === STUDY GUIDE UPLOAD ENDPOINTS ===
 app.post('/api/study-guides/upload', upload.single('file'), async (req, res) => {
   try {
     const { title, subject, moduleCode, userId, uploaderName, uploaderRole, tags, description } = req.body;
@@ -210,12 +209,11 @@ app.post('/api/study-guides/upload', upload.single('file'), async (req, res) => 
     
     console.log('📁 Processing file:', file.originalname, 'Type:', fileType);
     
-    // Extract text based on file type
     if (fileType === 'pdf') {
       try {
- const data = await pdfParse(file.buffer);
-extractedText = data.text;
-console.log('✅ PDF extracted:', extractedText.length, 'chars');      
+        const data = await pdfParse(file.buffer);
+        extractedText = data.text;
+        console.log('✅ PDF extracted:', extractedText.length, 'chars');
       } catch (pdfError) {
         console.error('❌ PDF Parse Error:', pdfError.message);
         extractedText = 'Could not extract text from PDF';
@@ -232,11 +230,7 @@ console.log('✅ PDF extracted:', extractedText.length, 'chars');
     } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff'].includes(fileType)) {
       try {
         console.log('🔍 Running OCR on image...');
-        const { data: { text } } = await Tesseract.recognize(
-          file.buffer,
-          'eng',
-          { logger: m => console.log(m) }
-        );
+        const { data: { text } } = await Tesseract.recognize(file.buffer, 'eng', { logger: m => console.log(m) });
         extractedText = text;
         console.log('✅ Image OCR extracted:', extractedText.length, 'chars');
       } catch (ocrError) {
@@ -252,31 +246,17 @@ console.log('✅ PDF extracted:', extractedText.length, 'chars');
       return res.status(400).json({ error: 'Could not extract text from file' });
     }
     
-    // Auto-verify for founder/admin
     const isVerified = uploaderRole === 'founder' || uploaderRole === 'admin';
     
     const studyGuide = new StudyGuide({
-      title,
-      subject,
-      moduleCode: moduleCode.toUpperCase(),
-      uploadedBy: userId,
-      uploaderName,
-      uploaderRole,
-      content: extractedText,
-      fileType: fileType.toUpperCase(),
-      fileName: file.originalname,
-      fileSize: Math.round(file.size / 1024),
-      tags: tags ? tags.split(',').map(t => t.trim()) : [],
-      description,
-      isVerified,
-      verifiedBy: isVerified ? userId : null
+      title, subject, moduleCode: moduleCode.toUpperCase(), uploadedBy: userId, uploaderName, uploaderRole,
+      content: extractedText, fileType: fileType.toUpperCase(), fileName: file.originalname,
+      fileSize: Math.round(file.size / 1024), tags: tags ? tags.split(',').map(t => t.trim()) : [],
+      description, isVerified, verifiedBy: isVerified ? userId : null
     });
     
     await studyGuide.save();
-    res.json({ 
-      message: `Study guide uploaded! 📚 ${isVerified ? '✅ Auto-verified' : '⏳ Pending verification'}`,
-      guide: studyGuide 
-    });
+    res.json({ message: `Study guide uploaded! 📚 ${isVerified ? '✅ Auto-verified' : '⏳ Pending verification'}`, guide: studyGuide });
   } catch (error) {
     console.error('Upload error:', error);
     res.status(500).json({ error: error.message });
@@ -287,7 +267,6 @@ app.post('/api/study-guides/paste-text', async (req, res) => {
   try {
     const { title, subject, moduleCode, userId, uploaderName, uploaderRole, tags, description, textContent } = req.body;
     if (!textContent || textContent.trim() === '') return res.status(400).json({ error: 'No text content' });
-    
     const isVerified = uploaderRole === 'founder' || uploaderRole === 'admin';
     const studyGuide = new StudyGuide({
       title, subject, moduleCode: moduleCode.toUpperCase(), uploadedBy: userId, uploaderName, uploaderRole,
@@ -311,7 +290,6 @@ app.get('/api/study-guides/search', async (req, res) => {
     if (subject) searchQuery.subject = { $regex: subject, $options: 'i' };
     if (isVerified !== undefined) searchQuery.isVerified = isVerified === 'true';
     if (query) searchQuery.$text = { $search: query };
-    
     const guides = await StudyGuide.find(searchQuery).select('-content').sort({ isVerified: -1, likes: -1, downloads: -1, createdAt: -1 }).limit(20).populate('uploadedBy', 'username displayName role');
     res.json({ guides });
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -372,203 +350,96 @@ app.get('/api/study-guides/module/:moduleCode', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// === NDIVHO AI - ENHANCED WITH STUDY GUIDES, IMAGES & LLAMA 3 ===
+// === NDIVHO AI ===
 app.post('/api/ndivho-ai/chat', async (req, res) => {
   try {
     const { message, userId, moduleCode } = req.body;
-    
     if (!message || message.trim() === '') {
       return res.json({ response: "Hey! I am Ndivho AI 🤖 How can I help you today?", source: 'local', timestamp: new Date() });
     }
     
     console.log('🔍 Searching for study guides... Message:', message, 'Module:', moduleCode);
-    
     let relevantGuides = [];
     let relevantContent = '';
     
-    // Search for relevant study guides
     try {
-      // First try: Search by module code if provided
       if (moduleCode) {
-        relevantGuides = await StudyGuide.find({ 
-          moduleCode: moduleCode.toUpperCase(),
-          isVerified: true 
-        }).sort({ likes: -1, downloads: -1 }).limit(5);
-        console.log(`✅ Found ${relevantGuides.length} guides for module ${moduleCode}`);
+        relevantGuides = await StudyGuide.find({ moduleCode: moduleCode.toUpperCase(), isVerified: true }).sort({ likes: -1, downloads: -1 }).limit(5);
       }
-      
-      // Second try: Search by keywords in message
       if (relevantGuides.length === 0) {
-        const keywords = message.toLowerCase().split(' ')
-          .filter(word => word.length > 3)
-          .filter(word => !['what', 'how', 'why', 'when', 'where', 'which', 'about', 'explain', 'tell', 'give', 'show'].includes(word));
-        
+        const keywords = message.toLowerCase().split(' ').filter(word => word.length > 3).filter(word => !['what', 'how', 'why', 'when', 'where', 'which', 'about', 'explain', 'tell', 'give', 'show'].includes(word));
         if (keywords.length > 0) {
-          const searchQuery = { 
-            $text: { $search: keywords.join(' ') },
-            isVerified: true 
-          };
-          relevantGuides = await StudyGuide.find(searchQuery)
-            .sort({ likes: -1, downloads: -1 }).limit(5);
-          console.log(`✅ Found ${relevantGuides.length} guides for keywords:`, keywords);
+          relevantGuides = await StudyGuide.find({ $text: { $search: keywords.join(' ') }, isVerified: true }).sort({ likes: -1, downloads: -1 }).limit(5);
         }
       }
-      
-      // Third try: Search all verified guides if still none found
       if (relevantGuides.length === 0) {
-        relevantGuides = await StudyGuide.find({ isVerified: true })
-          .sort({ createdAt: -1 }).limit(3);
-        console.log(`✅ Found ${relevantGuides.length} recent guides (fallback)`);
+        relevantGuides = await StudyGuide.find({ isVerified: true }).sort({ createdAt: -1 }).limit(3);
       }
-      
-      // Extract content from guides
       if (relevantGuides.length > 0) {
         relevantContent = relevantGuides.map(guide => {
-          // Get most relevant chunk (first 1500 chars)
           const contentSnippet = guide.content.substring(0, 1500);
           return `From "${guide.title}" (${guide.moduleCode}) - Uploaded by ${guide.uploaderName} (${guide.fileType}):\n${contentSnippet}`;
         }).join('\n\n---\n\n');
-        
-        console.log('📚 Study guide content length:', relevantContent.length);
-      } else {
-        console.log('⚠️ No study guides found');
       }
-    } catch (guideError) {
-      console.error('❌ Error fetching study guides:', guideError.message);
-      // Continue without study guides
-    }
+    } catch (guideError) { console.error('❌ Error fetching study guides:', guideError.message); }
     
-    // Build system prompt
-    const systemPrompt = `You are Ndivho AI, a friendly, knowledgeable study assistant for University of Venda (UNIVEN) students in South Africa.
-
-${relevantContent ? `📚 RELEVANT STUDY MATERIAL FROM UPLOADED GUIDES (including images, PDFs, documents):\n${relevantContent}\n\n` : ''}
-
-ABOUT UNIVEN:
-- Location: Thohoyandou, Limpopo, South Africa
-- Faculties: Agriculture/Science/Engineering, Commerce/Law/Management, Humanities/Social Sciences/Education, Health Sciences
-- Student Portal: myuniven.univen.ac.za
-
-YOUR ROLE:
-✅ If study material is provided above, use it FIRST to answer the student's question
-✅ Mention when you're using uploaded study material (e.g., "According to the study guide...")
-✅ If no study material is relevant, use your general knowledge
-✅ Explain complex topics in simple, clear terms
-✅ Be friendly, encouraging, and use emojis 📚✨
-✅ Keep responses concise but helpful (2-4 short paragraphs)
-✅ If asked about UNIVEN-specific info, direct to official channels
-✅ If you don't know something, say: "Great question! I'd recommend asking your lecturer or checking the UNIVEN library. 📚"
-
+    const systemPrompt = `You are Ndivho AI, a friendly study assistant for UNIVEN students in South Africa.
+${relevantContent ? `📚 RELEVANT STUDY MATERIAL:\n${relevantContent}\n\n` : ''}
+ABOUT UNIVEN: Location: Thohoyandou, Limpopo. Faculties: Agriculture/Science/Engineering, Commerce/Law/Management, Humanities/Social Sciences/Education, Health Sciences. Portal: myuniven.univen.ac.za
+YOUR ROLE: Use study material first if provided. Be friendly, concise, and helpful. If unsure, direct to official channels.
 Student question: ${message}`;
 
-    let response;
-    let source = 'local';
+    let response, source = 'local';
     
-    // Try Groq AI (Llama 3)
     if (process.env.GROQ_API_KEY) {
       try {
         const chatCompletion = await groq.chat.completions.create({
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: message }
-          ],
-          model: "llama-3.3-70b-versatile",
-          temperature: 0.7,
-          max_tokens: 600
+          messages: [{ role: "system", content: systemPrompt }, { role: "user", content: message }],
+          model: "llama-3.3-70b-versatile", temperature: 0.7, max_tokens: 600
         });
-        
         response = chatCompletion.choices[0]?.message?.content?.trim();
         source = relevantContent ? 'study-guide' : 'groq-llama3';
-        
-        if (!response || response.length < 20) {
-          throw new Error('Response too short');
-        }
-        
-      } catch (groqError) {
-        console.log('⚠️ Groq API error:', groqError.message);
-      }
+        if (!response || response.length < 20) throw new Error('Response too short');
+      } catch (groqError) { console.log('⚠️ Groq API error:', groqError.message); }
     }
     
-    // Fallback to local knowledge
     if (!response || response.length < 20) {
       const lowerMessage = message.toLowerCase();
-      
       if (lowerMessage.includes('math') || lowerMessage.includes('calculus')) {
-        response = "📐 **Mathematics** is the study of numbers, quantities, shapes, and patterns!\n\nAt UNIVEN, you'll study:\n• Calculus - Derivatives, integrals, rates of change\n• Algebra - Equations, functions, matrices\n• Statistics - Data analysis, probability\n\n💡 **Study Tip**: Practice daily! Math is like a muscle - use it or lose it. Work through examples, don't just read solutions.\n\nNeed help with a specific topic? Ask me! 🎓✨";
+        response = "📐 **Mathematics** is the study of numbers, quantities, shapes, and patterns!\n\nAt UNIVEN, you'll study:\n• Calculus - Derivatives, integrals, rates of change\n• Algebra - Equations, functions, matrices\n• Statistics - Data analysis, probability\n\n💡 **Study Tip**: Practice daily! Math is like a muscle - use it or lose it.\n\nNeed help with a specific topic? Ask me! 🎓✨";
       } else if (lowerMessage.includes('univen') || lowerMessage.includes('registration') || lowerMessage.includes('fees')) {
-        response = "🎓 **UNIVEN Info**: The University of Venda is in Thohoyandou, Limpopo.\n\n• Student Portal: myuniven.univen.ac.za\n• Library: Open Mon-Fri 8am-8pm, Sat 9am-2pm\n• NSFAS: Apply at www.nsfas.org.za (Sept-Oct)\n\nAlways check official channels for the most accurate, up-to-date information! 📚";
+        response = "🎓 **UNIVEN Info**: The University of Venda is in Thohoyandou, Limpopo.\n\n• Student Portal: myuniven.univen.ac.za\n• Library: Open Mon-Fri 8am-8pm, Sat 9am-2pm\n• NSFAS: Apply at www.nsfas.org.za (Sept-Oct)\n\nAlways check official channels! 📚";
       } else {
         response = "Hey! I am Ndivho AI 🤖 How can I help you today?\n\nI can help with:\n📚 Any UNIVEN module\n📝 Exam preparation\n💡 Study tips\n⏰ Time management\n💪 Motivation\n💼 Career advice\n\nJust ask me anything!";
       }
       source = 'local';
     }
     
-    res.json({ 
-      response, 
-      source,
-      studyGuidesUsed: relevantGuides.length,
-      timestamp: new Date() 
-    });
-    
+    res.json({ response, source, studyGuidesUsed: relevantGuides.length, timestamp: new Date() });
   } catch (error) {
     console.error('Ndivho AI error:', error);
-    res.status(500).json({ 
-      response: "Sorry, I'm having trouble right now. Please try again! 🙏",
-      source: 'error',
-      timestamp: new Date()
-    });
+    res.status(500).json({ response: "Sorry, I'm having trouble right now. Please try again! 🙏", source: 'error', timestamp: new Date() });
   }
 });
 
-app.get('/api/ndivho-ai/tips', async (req, res) => {
-  try { res.json({ tips: [], source: 'local' }); }
-  catch (error) { res.status(500).json({ error: error.message }); }
-});
+app.get('/api/ndivho-ai/tips', async (req, res) => { try { res.json({ tips: [], source: 'local' }); } catch (error) { res.status(500).json({ error: error.message }); } });
+app.get('/api/ndivho-ai/modules', async (req, res) => { try { res.json({ modules: { agriculture: ['Agronomy', 'Animal Science', 'Soil Science'], sciences: ['Mathematics', 'Physics', 'Chemistry', 'Biology'], computer_science: ['Programming', 'Data Structures', 'Algorithms', 'Databases'], engineering: ['Electrical', 'Mechanical', 'Civil Engineering'], commerce: ['Accounting', 'Economics', 'Business Management'], law: ['Constitutional Law', 'Contract Law', 'Criminal Law'], education: ['Educational Psychology', 'Curriculum Studies'], humanities: ['Psychology', 'Sociology', 'History'], health: ['Nursing', 'Medicine', 'Nutrition', 'Pharmacy'] } }); } catch (error) { res.status(500).json({ error: error.message }); } });
+app.post('/api/ndivho-ai/suggest', async (req, res) => { try { console.log('📚 NEW KNOWLEDGE SUGGESTION:', req.body); res.json({ message: 'Thank you! 🙏 Your suggestion has been submitted!', status: 'pending_review' }); } catch (error) { res.status(500).json({ error: error.message }); } });
 
-app.get('/api/ndivho-ai/modules', async (req, res) => {
-  try {
-    const modules = {
-      agriculture: ['Agronomy', 'Animal Science', 'Soil Science'],
-      sciences: ['Mathematics', 'Physics', 'Chemistry', 'Biology'],
-      computer_science: ['Programming', 'Data Structures', 'Algorithms', 'Databases'],
-      engineering: ['Electrical', 'Mechanical', 'Civil Engineering'],
-      commerce: ['Accounting', 'Economics', 'Business Management'],
-      law: ['Constitutional Law', 'Contract Law', 'Criminal Law'],
-      education: ['Educational Psychology', 'Curriculum Studies'],
-      humanities: ['Psychology', 'Sociology', 'History'],
-      health: ['Nursing', 'Medicine', 'Nutrition', 'Pharmacy']
-    };
-    res.json({ modules });
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.post('/api/ndivho-ai/suggest', async (req, res) => {
-  try {
-    console.log('📚 NEW KNOWLEDGE SUGGESTION:', req.body);
-    res.json({ message: 'Thank you! 🙏 Your suggestion has been submitted!', status: 'pending_review' });
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-// === SOCKET.IO FOR REAL-TIME ===
+// === SOCKET.IO ===
 const userSockets = {};
-
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
   socket.on("register_user", (userId) => { userSockets[userId] = socket.id; socket.userId = userId; });
   socket.on("join_room", (roomId) => { socket.join(roomId); });
   socket.on("leave_room", (roomId) => { socket.leave(roomId); });
-  socket.on("send_room_message", (data) => {
-    const messageData = { ...data, timestamp: new Date() };
-    io.to(data.roomId).emit("receive_room_message", messageData);
-  });
+  socket.on("send_room_message", (data) => { io.to(data.roomId).emit("receive_room_message", { ...data, timestamp: new Date() }); });
   socket.on("send_message", async (data) => {
     try {
       const { senderId, receiverId, content } = data;
       const sender = await User.findById(senderId);
       const receiver = await User.findById(receiverId);
-      if (sender?.blockedUsers?.includes(receiverId) || receiver?.blockedUsers?.includes(senderId)) {
-        socket.emit("error_message", { error: "You cannot send messages to this user" });
-        return;
-      }
+      if (sender?.blockedUsers?.includes(receiverId) || receiver?.blockedUsers?.includes(senderId)) { socket.emit("error_message", { error: "You cannot send messages to this user" }); return; }
       const message = new Message({ sender: senderId, receiver: receiverId, content });
       await message.save();
       await message.populate('sender', 'username displayName');
@@ -577,22 +448,9 @@ io.on("connection", (socket) => {
       socket.emit("message_sent", message);
     } catch (error) { socket.emit("error_message", { error: error.message }); }
   });
-  socket.on("mark_read", async (data) => {
-    try {
-      await Message.findByIdAndUpdate(data.messageId, { read: true, readAt: new Date() });
-      const message = await Message.findById(data.messageId);
-      const receiverSocketId = userSockets[message?.sender?.toString()];
-      if (receiverSocketId) io.to(receiverSocketId).emit("message_read", { messageId: data.messageId, readAt: new Date() });
-    } catch (error) { console.error("Error marking read:", error); }
-  });
-  socket.on("typing_start", (data) => {
-    const target = data.roomId || data.receiverId;
-    socket.to(target).emit("user_typing", { senderId: data.senderId, senderName: data.senderName, isTyping: true });
-  });
-  socket.on("typing_stop", (data) => {
-    const target = data.roomId || data.receiverId;
-    socket.to(target).emit("user_typing", { senderId: data.senderId, senderName: data.senderName, isTyping: false });
-  });
+  socket.on("mark_read", async (data) => { try { await Message.findByIdAndUpdate(data.messageId, { read: true, readAt: new Date() }); const message = await Message.findById(data.messageId); const receiverSocketId = userSockets[message?.sender?.toString()]; if (receiverSocketId) io.to(receiverSocketId).emit("message_read", { messageId: data.messageId, readAt: new Date() }); } catch (error) { console.error("Error marking read:", error); } });
+  socket.on("typing_start", (data) => { socket.to(data.roomId || data.receiverId).emit("user_typing", { senderId: data.senderId, senderName: data.senderName, isTyping: true }); });
+  socket.on("typing_stop", (data) => { socket.to(data.roomId || data.receiverId).emit("user_typing", { senderId: data.senderId, senderName: data.senderName, isTyping: false }); });
   socket.on("disconnect", () => { delete userSockets[socket.userId]; });
 });
 

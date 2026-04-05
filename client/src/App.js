@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import "./App.css";
 
-const socket = io.connect("http://localhost:3001");
+const socket = io.connect("https://univen-chat.onrender.com");
 
 function App() {
   // === AUTH STATE ===
@@ -106,13 +106,13 @@ function App() {
   // === NEWS FEED STATE ===
   const [newsPosts, setNewsPosts] = useState([]);
   const [showNewsForm, setShowNewsForm] = useState(false);
-  const [newsPost, setNewsPost] = useState({ content: "", images: [], tags: "" });
+  const [newsPost, setNewsPost] = useState({ content: "", images: [], tags: ""});
   const [newsImages, setNewsImages] = useState([]);
 
   // === EXAM PREP STATE ===
   const [examThreads, setExamThreads] = useState([]);
   const [showThreadForm, setShowThreadForm] = useState(false);
-  const [examThread, setExamThread] = useState({ title: "", question: "", image: "" });
+  const [examThread, setExamThread] = useState({ title: "", question: "", image: ""});
   const [threadImage, setThreadImage] = useState(null);
   const [activeThreadId, setActiveThreadId] = useState(null);
   const [threadReply, setThreadReply] = useState("");
@@ -157,7 +157,7 @@ function App() {
   // === AUTH FUNCTIONS ===
   const handleRegister = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/register', {
+      const response = await fetch('https://univen-chat.onrender.com/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -186,7 +186,7 @@ function App() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/login', {
+      const response = await fetch('https://univen-chat.onrender.com/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: authUsername, password: authPassword })
@@ -251,7 +251,7 @@ function App() {
   // === ROOM FUNCTIONS ===
   const fetchRooms = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/rooms');
+      const response = await fetch('https://univen-chat.onrender.com/api/rooms');
       const data = await response.json();
       setRooms(data);
       if (data.length > 0) setCurrentRoom(data[0].id);
@@ -344,7 +344,7 @@ function App() {
     }
     
     try {
-      const allUsersResponse = await fetch('http://localhost:3001/api/users');
+      const allUsersResponse = await fetch('https://univen-chat.onrender.com/api/users');
       const allUsersData = await allUsersResponse.json();
       
       const filtered = allUsersData.filter(user => 
@@ -362,7 +362,7 @@ function App() {
   // === LOST & FOUND FUNCTIONS ===
   const fetchLostFoundItems = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/lost-found');
+      const response = await fetch('https://univen-chat.onrender.com/api/lost-found');
       const data = await response.json();
       setLostFoundItems(data);
     } catch (error) {
@@ -372,7 +372,7 @@ function App() {
 
   const createLostFoundItem = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/lost-found', {
+      const response = await fetch('https://univen-chat.onrender.com/api/lost-found', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, username, ...lostFoundItem, images: lfImages })
@@ -380,7 +380,7 @@ function App() {
       await response.json();
       alert('Item posted! ✅');
       setShowLostFoundForm(false);
-      setLostFoundItem({ type: "Found", title: "", description: "", location: "", date: "", images: [], contactInfo: "" });
+      setLostFoundItem({ type: "Found", title: "", description: "", location: "", date: "", images: [], contactInfo: ""});
       setLfImages([]);
       fetchLostFoundItems();
     } catch (error) {
@@ -390,7 +390,7 @@ function App() {
 
   const claimItem = async () => {
     try {
-      await fetch(`http://localhost:3001/api/lost-found/${itemToClaim}/claim`, {
+      await fetch(`https://univen-chat.onrender.com/api/lost-found/${itemToClaim}/claim`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, verificationNotes: claimNotes })
@@ -407,7 +407,7 @@ function App() {
 
   const returnItem = async (itemId) => {
     try {
-      await fetch(`http://localhost:3001/api/lost-found/${itemId}/return`, { method: 'PUT' });
+      await fetch(`https://univen-chat.onrender.com/api/lost-found/${itemId}/return`, { method: 'PUT' });
       alert('Item marked as returned! ✅');
       fetchLostFoundItems();
     } catch (error) {
@@ -419,7 +419,7 @@ function App() {
   const fetchMarketplaceItems = async () => {
     try {
       const query = `?category=${marketFilter}&search=${marketSearch}`;
-      const response = await fetch(`http://localhost:3001/api/marketplace${query}`);
+      const response = await fetch(`https://univen-chat.onrender.com/api/marketplace${query}`);
       const data = await response.json();
       setMarketplaceItems(data);
     } catch (error) {
@@ -433,7 +433,7 @@ function App() {
 
   const createMarketItem = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/marketplace', {
+      const response = await fetch('https://univen-chat.onrender.com/api/marketplace', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sellerId: userId, sellerName: username, ...marketItem, images: marketImages })
@@ -441,7 +441,7 @@ function App() {
       await response.json();
       alert('Item listed! ✅');
       setShowMarketForm(false);
-      setMarketItem({ title: "", description: "", price: "", category: "Other", condition: "Good", images: [], contactInfo: "" });
+      setMarketItem({ title: "", description: "", price: "", category: "Other", condition: "Good", images: [], contactInfo: ""});
       setMarketImages([]);
       fetchMarketplaceItems();
     } catch (error) {
@@ -451,7 +451,7 @@ function App() {
 
   const markInterested = async (itemId) => {
     try {
-      await fetch(`http://localhost:3001/api/marketplace/${itemId}/interested`, {
+      await fetch(`https://univen-chat.onrender.com/api/marketplace/${itemId}/interested`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId })
@@ -481,7 +481,7 @@ function App() {
   const fetchStudyResources = async () => {
     try {
       const query = `?subject=${libraryFilter}&search=${librarySearch}`;
-      const response = await fetch(`http://localhost:3001/api/study-resources${query}`);
+      const response = await fetch(`https://univen-chat.onrender.com/api/study-resources${query}`);
       const data = await response.json();
       setStudyResources(data);
     } catch (error) {
@@ -495,7 +495,7 @@ function App() {
 
   const createStudyResource = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/study-resources', {
+      const response = await fetch('https://univen-chat.onrender.com/api/study-resources', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -509,7 +509,7 @@ function App() {
       await response.json();
       alert('Resource shared! ✅');
       setShowResourceForm(false);
-      setStudyResource({ title: "", description: "", subject: "Other", gradeLevel: "First Year", fileType: "PDF", fileUrl: "", fileName: "", fileSize: "", tags: "" });
+      setStudyResource({ title: "", description: "", subject: "Other", gradeLevel: "First Year", fileType: "PDF", fileUrl: "", fileName: "", fileSize: "", tags: ""});
       setResourceFile(null);
       fetchStudyResources();
     } catch (error) {
@@ -519,7 +519,7 @@ function App() {
 
   const likeResource = async (id) => {
     try {
-      await fetch(`http://localhost:3001/api/study-resources/${id}/like`, {
+      await fetch(`https://univen-chat.onrender.com/api/study-resources/${id}/like`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId })
@@ -532,7 +532,7 @@ function App() {
 
   const downloadResource = async (id) => {
     try {
-      await fetch(`http://localhost:3001/api/study-resources/${id}/download`, { method: 'PUT' });
+      await fetch(`https://univen-chat.onrender.com/api/study-resources/${id}/download`, { method: 'PUT' });
       alert('Download started! 📥');
       fetchStudyResources();
     } catch (error) {
@@ -543,7 +543,7 @@ function App() {
   // === NEWS FEED FUNCTIONS ===
   const fetchNewsPosts = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/news');
+      const response = await fetch('https://univen-chat.onrender.com/api/news');
       const data = await response.json();
       setNewsPosts(data);
     } catch (error) {
@@ -553,7 +553,7 @@ function App() {
 
   const createNewsPost = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/news', {
+      const response = await fetch('https://univen-chat.onrender.com/api/news', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -567,7 +567,7 @@ function App() {
       await response.json();
       alert('Post published! ✅');
       setShowNewsForm(false);
-      setNewsPost({ content: "", images: [], tags: "" });
+      setNewsPost({ content: "", images: [], tags: ""});
       setNewsImages([]);
       fetchNewsPosts();
     } catch (error) {
@@ -578,7 +578,7 @@ function App() {
   // === EXAM PREP FUNCTIONS ===
   const fetchExamThreads = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/exam-threads/exam-prep`);
+      const response = await fetch(`https://univen-chat.onrender.com/api/exam-threads/exam-prep`);
       const data = await response.json();
       setExamThreads(data);
     } catch (error) {
@@ -588,7 +588,7 @@ function App() {
 
   const createExamThread = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/exam-threads', {
+      const response = await fetch('https://univen-chat.onrender.com/api/exam-threads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -602,7 +602,7 @@ function App() {
       await response.json();
       alert('Thread created! ✅');
       setShowThreadForm(false);
-      setExamThread({ title: "", question: "", image: "" });
+      setExamThread({ title: "", question: "", image: ""});
       setThreadImage(null);
       fetchExamThreads();
     } catch (error) {
@@ -612,7 +612,7 @@ function App() {
 
   const replyToThread = async (threadId) => {
     try {
-      await fetch(`http://localhost:3001/api/exam-threads/${threadId}/reply`, {
+      await fetch(`https://univen-chat.onrender.com/api/exam-threads/${threadId}/reply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -631,7 +631,7 @@ function App() {
   // === FRIEND FUNCTIONS ===
   const fetchFriends = async (uid) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/friends/${uid}`);
+      const response = await fetch(`https://univen-chat.onrender.com/api/friends/${uid}`);
       const data = await response.json();
       setFriends(data);
     } catch (error) {
@@ -641,7 +641,7 @@ function App() {
 
   const fetchFriendRequests = async (uid) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/friend-requests/${uid}`);
+      const response = await fetch(`https://univen-chat.onrender.com/api/friend-requests/${uid}`);
       const data = await response.json();
       setFriendRequests(data);
     } catch (error) {
@@ -651,7 +651,7 @@ function App() {
 
   const fetchAllUsers = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/users');
+      const response = await fetch('https://univen-chat.onrender.com/api/users');
       const data = await response.json();
       setAllUsers(data.filter(u => u.username !== username));
     } catch (error) {
@@ -661,7 +661,7 @@ function App() {
 
   const sendFriendRequest = async (receiverId) => {
     try {
-      await fetch('http://localhost:3001/api/friend-request', {
+      await fetch('https://univen-chat.onrender.com/api/friend-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ senderId: userId, receiverId })
@@ -675,7 +675,7 @@ function App() {
 
   const handleFriendRequest = async (requestId, status) => {
     try {
-      await fetch(`http://localhost:3001/api/friend-request/${requestId}`, {
+      await fetch(`https://univen-chat.onrender.com/api/friend-request/${requestId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
@@ -695,7 +695,7 @@ function App() {
   const confirmBlockUser = async () => {
     if (!userToBlock) return;
     try {
-      await fetch('http://localhost:3001/api/block', {
+      await fetch('https://univen-chat.onrender.com/api/block', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, blockedUserId: userToBlock })
@@ -712,7 +712,7 @@ function App() {
   const selectFriend = async (friend) => {
     setSelectedFriend(friend);
     try {
-      const response = await fetch(`http://localhost:3001/api/messages/${userId}/${friend._id}`);
+      const response = await fetch(`https://univen-chat.onrender.com/api/messages/${userId}/${friend._id}`);
       const data = await response.json();
       setPrivateMessages(data);
     } catch (error) {
@@ -737,7 +737,7 @@ function App() {
   // === SINGLE & MINGLE FUNCTIONS ===
   const fetchConnectionProfiles = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/connections');
+      const response = await fetch('https://univen-chat.onrender.com/api/connections');
       const data = await response.json();
       setConnectionProfiles(data.filter(p => p.user.toString() !== userId));
     } catch (error) {
@@ -747,7 +747,7 @@ function App() {
 
   const fetchMatches = async (uid) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/connections/matches/${uid}`);
+      const response = await fetch(`https://univen-chat.onrender.com/api/connections/matches/${uid}`);
       const data = await response.json();
       setMatches(data);
     } catch (error) {
@@ -757,7 +757,7 @@ function App() {
 
   const createConnectionProfile = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/connections/profile', {
+      const response = await fetch('https://univen-chat.onrender.com/api/connections/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, username, ...userProfile })
@@ -773,7 +773,7 @@ function App() {
 
   const likeProfile = async (likedId) => {
     try {
-      const response = await fetch('http://localhost:3001/api/connections/like', {
+      const response = await fetch('https://univen-chat.onrender.com/api/connections/like', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ likerId: userId, likedId })
@@ -792,7 +792,7 @@ function App() {
 
   const passProfile = async (passedId) => {
     try {
-      await fetch('http://localhost:3001/api/connections/pass', {
+      await fetch('https://univen-chat.onrender.com/api/connections/pass', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ passerId: userId, passedId })
@@ -805,7 +805,7 @@ function App() {
 
   const calculateCompatibility = async (profileId) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/connections/compatibility/${userId}/${profileId}`);
+      const response = await fetch(`https://univen-chat.onrender.com/api/connections/compatibility/${userId}/${profileId}`);
       const data = await response.json();
       setCompatibility(data);
     } catch (error) {
@@ -816,7 +816,7 @@ function App() {
   // === MINGLE STATUS FUNCTIONS ===
   const fetchMingleStatuses = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/mingle/statuses?userId=${userId}`);
+      const response = await fetch(`https://univen-chat.onrender.com/api/mingle/statuses?userId=${userId}`);
       const data = await response.json();
       setMingleStatuses(data);
     } catch (error) {
@@ -839,7 +839,7 @@ function App() {
         formData.append('image', statusImage);
       }
       
-      const response = await fetch('http://localhost:3001/api/mingle/status', {
+      const response = await fetch('https://univen-chat.onrender.com/api/mingle/status', {
         method: 'POST',
         body: formData
       });
@@ -892,7 +892,7 @@ function App() {
 
   const reactToPost = async (postId, reaction) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/news/${postId}/react`, {
+      const response = await fetch(`https://univen-chat.onrender.com/api/news/${postId}/react`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, reaction })
@@ -909,7 +909,7 @@ function App() {
     const content = parentId ? (newComment[`${postId}_${parentId}`] || '').trim() : (newComment[postId] || '').trim();
     if (!content) return;
     try {
-      const response = await fetch(`http://localhost:3001/api/news/${postId}/comment`, {
+      const response = await fetch(`https://univen-chat.onrender.com/api/news/${postId}/comment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, username, content, parentId })
@@ -929,7 +929,7 @@ function App() {
 
   const likeComment = async (postId, commentId) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/news/${postId}/comment/${commentId}/like`, {
+      const response = await fetch(`https://univen-chat.onrender.com/api/news/${postId}/comment/${commentId}/like`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId })
@@ -943,7 +943,7 @@ function App() {
 
   const sharePost = async (postId) => {
     try {
-      await fetch(`http://localhost:3001/api/news/${postId}/share`, { method: 'POST' });
+      await fetch(`https://univen-chat.onrender.com/api/news/${postId}/share`, { method: 'POST' });
       alert('Post shared! 🔗');
     } catch (error) {
       console.error('Error sharing:', error);
@@ -957,7 +957,7 @@ function App() {
 
   const fetchPostComments = async (postId) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/news/${postId}/comments`);
+      const response = await fetch(`https://univen-chat.onrender.com/api/news/${postId}/comments`);
       const comments = await response.json();
       setPostComments(prev => ({ ...prev, [postId]: comments }));
     } catch (error) {
@@ -982,7 +982,7 @@ function App() {
     setNdivhoInput("");
     setIsAITyping(true);
     try {
-      const response = await fetch('http://localhost:3001/api/ndivho-ai/chat', {
+      const response = await fetch('https://univen-chat.onrender.com/api/ndivho-ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage })
@@ -1006,7 +1006,7 @@ function App() {
     setAiInput("");
     setIsAiTyping(true);
     try {
-      const response = await fetch('http://localhost:3001/api/ndivho-ai/chat', {
+      const response = await fetch('https://univen-chat.onrender.com/api/ndivho-ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage, userId, moduleCode: aiModuleCode })
@@ -1034,7 +1034,7 @@ function App() {
     formData.append('uploaderRole', 'founder');
 
     try {
-      const response = await fetch('http://localhost:3001/api/study-guides/upload', {
+      const response = await fetch('https://univen-chat.onrender.com/api/study-guides/upload', {
         method: 'POST',
         body: formData
       });
@@ -1059,7 +1059,7 @@ function App() {
   // === PROFILE FUNCTIONS ===
   const fetchUserProfile = async (username) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/profile/${username}`);
+      const response = await fetch(`https://univen-chat.onrender.com/api/profile/${username}`);
       const user = await response.json();
       setEditProfile({
         displayName: user.displayName || "",
@@ -1089,7 +1089,7 @@ function App() {
 
   const updateProfile = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/profile/${username}`, {
+      const response = await fetch(`https://univen-chat.onrender.com/api/profile/${username}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editProfile)
@@ -1148,33 +1148,33 @@ function App() {
               <h2>Welcome Back 👋</h2>
               <div className="input-group-modern">
                 <label>Username</label>
-                <input type="text" value={authUsername} onChange={(e) => setAuthUsername(e.target.value)} placeholder="Enter username" />
+                <input type="text"value={authUsername} onChange={(e) => setAuthUsername(e.target.value)} placeholder="Enter username"/>
               </div>
               <div className="input-group-modern">
                 <label>Password</label>
-                <input type="password" value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} placeholder="Enter password" />
+                <input type="password"value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} placeholder="Enter password"/>
               </div>
               {authError && <div className="error-message">{authError}</div>}
-              <button className="btn-primary" onClick={handleLogin}>Login</button>
+              <button className="btn-primary"onClick={handleLogin}>Login</button>
             </div>
           ) : (
             <div className="auth-form-modern">
               <h2>Create Account</h2>
               <div className="input-group-modern">
                 <label>Username</label>
-                <input type="text" value={authUsername} onChange={(e) => setAuthUsername(e.target.value)} placeholder="Choose username" />
+                <input type="text"value={authUsername} onChange={(e) => setAuthUsername(e.target.value)} placeholder="Choose username"/>
               </div>
               <div className="input-group-modern">
                 <label>Display Name</label>
-                <input type="text" value={authDisplayName} onChange={(e) => setAuthDisplayName(e.target.value)} placeholder="Your name" />
+                <input type="text"value={authDisplayName} onChange={(e) => setAuthDisplayName(e.target.value)} placeholder="Your name"/>
               </div>
               <div className="input-group-modern">
                 <label>Email</label>
-                <input type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} placeholder="Your email" />
+                <input type="email"value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} placeholder="Your email"/>
               </div>
               <div className="input-group-modern">
                 <label>Phone Number</label>
-                <input type="tel" value={authPhone} onChange={(e) => setAuthPhone(e.target.value)} placeholder="Your phone number" />
+                <input type="tel"value={authPhone} onChange={(e) => setAuthPhone(e.target.value)} placeholder="Your phone number"/>
               </div>
               <div className="input-group-modern">
                 <label>Gender</label>
@@ -1216,17 +1216,17 @@ function App() {
               {authRelationshipStatus === 'Single' && (
                 <div className="input-group-modern checkbox-group">
                   <label>
-                    <input type="checkbox" checked={authJoinMingle} onChange={(e) => setAuthJoinMingle(e.target.checked)} />
+                    <input type="checkbox"checked={authJoinMingle} onChange={(e) => setAuthJoinMingle(e.target.checked)} />
                     Join Single & Mingle automatically
                   </label>
                 </div>
               )}
               <div className="input-group-modern">
                 <label>Password</label>
-                <input type="password" value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} placeholder="Create password" />
+                <input type="password"value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} placeholder="Create password"/>
               </div>
               {authError && <div className="error-message">{authError}</div>}
-              <button className="btn-primary" onClick={handleRegister}>Register</button>
+              <button className="btn-primary"onClick={handleRegister}>Register</button>
             </div>
           )}
         </div>
@@ -1242,8 +1242,8 @@ function App() {
         <div className="sidebar">
           <div className="sidebar-header">
             <h2 className="chat-title">UNIVEN</h2>
-            <div className="user-avatar-small" onClick={() => setShowProfile(true)}>
-              {editProfile.avatar ? <img src={editProfile.avatar} alt="avatar" /> : <span>👤</span>}
+            <div className="user-avatar-small"onClick={() => setShowProfile(true)}>
+              {editProfile.avatar ? <img src={editProfile.avatar} alt="avatar"/> : <span>👤</span>}
             </div>
           </div>
           <div className="nav-tabs-sidebar">
@@ -1296,13 +1296,13 @@ function App() {
                     {searchResults.map(user => (
                       <div key={user._id} className="search-result-item">
                         <div className="result-avatar">
-                          {user.avatar ? <img src={user.avatar} alt="" /> : <span>👤</span>}
+                          {user.avatar ? <img src={user.avatar} alt=""/> : <span>👤</span>}
                         </div>
                         <div className="result-info">
                           <h4>{user.displayName || user.username}</h4>
                           <p>@{user.username}</p>
                         </div>
-                        <button className="btn-add-friend" onClick={() => sendFriendRequest(user._id)}>+ Add</button>
+                        <button className="btn-add-friend"onClick={() => sendFriendRequest(user._id)}>+ Add</button>
                       </div>
                     ))}
                   </div>
@@ -1313,7 +1313,7 @@ function App() {
               {friends.map(friend => (
                 <div key={friend._id} className={`friend-item ${selectedFriend?._id === friend._id ? 'active' : ''}`} onClick={() => selectFriend(friend)}>
                   <div className="friend-avatar">
-                    {friend.avatar ? <img src={friend.avatar} alt="" /> : <span>👤</span>}
+                    {friend.avatar ? <img src={friend.avatar} alt=""/> : <span>👤</span>}
                     <span className={`status-indicator ${friend.status === 'online' ? 'online' : 'offline'}`}></span>
                   </div>
                   <div className="friend-info">
@@ -1334,8 +1334,8 @@ function App() {
                       <p>{request.sender.username}</p>
                     </div>
                     <div className="request-actions">
-                      <button className="btn-accept" onClick={() => handleFriendRequest(request._id, 'accepted')}>✓</button>
-                      <button className="btn-reject" onClick={() => handleFriendRequest(request._id, 'rejected')}>✕</button>
+                      <button className="btn-accept"onClick={() => handleFriendRequest(request._id, 'accepted')}>✓</button>
+                      <button className="btn-reject"onClick={() => handleFriendRequest(request._id, 'rejected')}>✕</button>
                     </div>
                   </div>
                 ))
@@ -1344,13 +1344,13 @@ function App() {
           )}
           {activeTab === 'news' && (
             <div className="news-sidebar">
-              <button className="btn-primary" onClick={() => setShowNewsForm(!showNewsForm)}>
+              <button className="btn-primary"onClick={() => setShowNewsForm(!showNewsForm)}>
                 {showNewsForm ? 'Cancel' : '+ Create Post'}
               </button>
               {showNewsForm && (
                 <div className="form-container">
-                  <textarea placeholder="What's happening?" value={newsPost.content} onChange={(e) => setNewsPost({ ...newsPost, content: e.target.value })} />
-                  <input type="file" accept="image/*" multiple onChange={async (e) => {
+                  <textarea placeholder="What's happening?"value={newsPost.content} onChange={(e) => setNewsPost({ ...newsPost, content: e.target.value })} />
+                  <input type="file"accept="image/*"multiple onChange={async (e) => {
                     const files = Array.from(e.target.files);
                     const imagePromises = files.map(file => {
                       return new Promise((resolve) => {
@@ -1363,24 +1363,24 @@ function App() {
                     setNewsImages(images);
                   }} />
                   {newsImages.length > 0 && <p className="image-preview-count">{newsImages.length} image(s) selected</p>}
-                  <input type="text" placeholder="Tags (comma separated)" value={newsPost.tags} onChange={(e) => setNewsPost({ ...newsPost, tags: e.target.value })} />
-                  <button className="btn-primary" onClick={createNewsPost}>Publish</button>
+                  <input type="text"placeholder="Tags (comma separated)"value={newsPost.tags} onChange={(e) => setNewsPost({ ...newsPost, tags: e.target.value })} />
+                  <button className="btn-primary"onClick={createNewsPost}>Publish</button>
                 </div>
               )}
             </div>
           )}
           <div className="sidebar-footer">
-            <div className="user-info-footer" onClick={() => setShowProfile(true)}>
+            <div className="user-info-footer"onClick={() => setShowProfile(true)}>
               <div className="user-avatar-small">
-                {editProfile.avatar ? <img src={editProfile.avatar} alt="" /> : <span>👤</span>}
+                {editProfile.avatar ? <img src={editProfile.avatar} alt=""/> : <span>👤</span>}
               </div>
               <div className="user-details">
                 <h4>{editProfile.displayName || username}</h4>
-                {currentUser?.role === 'founder' && <p className="user-status" style={{ color: '#feca57' }}>👑 Founder</p>}
+                {currentUser?.role === 'founder' && <p className="user-status"style={{ color: '#feca57' }}>👑 Founder</p>}
                 {currentUser?.role !== 'founder' && <p className="user-status">● Online</p>}
               </div>
             </div>
-            <button className="logout-btn" onClick={handleLogout}>Logout</button>
+            <button className="logout-btn"onClick={handleLogout}>Logout</button>
           </div>
         </div>
 
@@ -1392,7 +1392,7 @@ function App() {
               <div className="ai-room-header-full">
                 <div className="ai-header-left">
                   <div className="ai-avatar-large">
-                    <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                    <img src="/images/ndivho-avatar.jpg"alt="Ndivho"style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                   </div>
                   <div className="ai-title-section">
                     <h2>Ndivho AI</h2>
@@ -1416,7 +1416,7 @@ function App() {
                     />
                     📤 Upload Study Guide
                   </label>
-                  <button className="close-ai-room-btn" onClick={() => setAiRoomActive(false)}>×</button>
+                  <button className="close-ai-room-btn"onClick={() => setAiRoomActive(false)}>×</button>
                 </div>
               </div>
               <div className="ai-chat-container">
@@ -1425,7 +1425,7 @@ function App() {
                     <div key={i} className={`ai-chat-message ${msg.sender}`}>
                       <div className="ai-chat-avatar">
                         {msg.sender === 'bot' ? (
-                          <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                          <img src="/images/ndivho-avatar.jpg"alt="Ndivho"style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                         ) : (
                           '👤'
                         )}
@@ -1458,7 +1458,7 @@ function App() {
                     placeholder="Ask me anything about your studies, upload notes, or get help with any subject..."
                     className="ai-chat-input"
                   />
-                  <button className="ai-send-button" onClick={sendToAI}>Send</button>
+                  <button className="ai-send-button"onClick={sendToAI}>Send</button>
                 </div>
               </div>
             </div>
@@ -1470,10 +1470,10 @@ function App() {
               <div className="connections-header">
                 <h2>💕 Single & Mingle</h2>
                 <div className="connections-actions">
-                  <button className="btn-secondary" onClick={() => setShowStatusForm(!showStatusForm)}>
+                  <button className="btn-secondary"onClick={() => setShowStatusForm(!showStatusForm)}>
                     {showStatusForm ? 'Cancel' : '📸 Post Status'}
                   </button>
-                  <button className="btn-primary" onClick={() => setShowProfileForm(!showProfileForm)}>
+                  <button className="btn-primary"onClick={() => setShowProfileForm(!showProfileForm)}>
                     {showProfileForm ? 'Cancel' : 'Create Profile'}
                   </button>
                 </div>
@@ -1496,7 +1496,7 @@ function App() {
                     onChange={(e) => setStatusImage(e.target.files[0])}
                   />
                   {statusImage && <div className="image-preview">📷 {statusImage.name}</div>}
-                  <button className="btn-primary" onClick={createMingleStatus}>Post Status</button>
+                  <button className="btn-primary"onClick={createMingleStatus}>Post Status</button>
                 </div>
               )}
 
@@ -1508,7 +1508,7 @@ function App() {
                     <div key={status._id} className="status-card">
                       <div className="status-header">
                         <div className="status-avatar">
-                          {status.user?.avatar ? <img src={status.user.avatar} alt="" /> : <span>👤</span>}
+                          {status.user?.avatar ? <img src={status.user.avatar} alt=""/> : <span>👤</span>}
                         </div>
                         <div className="status-info">
                           <h4>{status.user?.displayName || status.username}</h4>
@@ -1516,7 +1516,7 @@ function App() {
                         </div>
                       </div>
                       {status.text && <p className="status-text">{status.text}</p>}
-                      {status.image && <img src={status.image} alt="status" className="status-image" />}
+                      {status.image && <img src={status.image} alt="status"className="status-image"/>}
                       <div className="status-actions">
                         <button className="status-action-btn">❤️ Like</button>
                         <button className="status-action-btn">💬 Comment</button>
@@ -1530,19 +1530,19 @@ function App() {
               {showProfileForm && (
                 <div className="form-container">
                   <h3>Create Your Connection Profile</h3>
-                  <input type="number" placeholder="Age" value={userProfile.age} onChange={(e) => setUserProfile({ ...userProfile, age: e.target.value })} />
-                  <input type="text" placeholder="Faculty" value={userProfile.faculty} onChange={(e) => setUserProfile({ ...userProfile, faculty: e.target.value })} />
-                  <textarea placeholder="Bio (keep it fun!)" value={userProfile.bio} onChange={(e) => setUserProfile({ ...userProfile, bio: e.target.value })} />
+                  <input type="number"placeholder="Age"value={userProfile.age} onChange={(e) => setUserProfile({ ...userProfile, age: e.target.value })} />
+                  <input type="text"placeholder="Faculty"value={userProfile.faculty} onChange={(e) => setUserProfile({ ...userProfile, faculty: e.target.value })} />
+                  <textarea placeholder="Bio (keep it fun!)"value={userProfile.bio} onChange={(e) => setUserProfile({ ...userProfile, bio: e.target.value })} />
                   <select value={userProfile.lookingFor} onChange={(e) => setUserProfile({ ...userProfile, lookingFor: e.target.value })}>
                     <option value="Friends">Friends</option>
                     <option value="Study Buddy">Study Buddy</option>
                     <option value="Partner">Looking for a Partner</option>
                     <option value="Business Collab">Business Collab</option>
                   </select>
-                  <input type="text" placeholder="Interests (comma separated)" value={userProfile.interests.join(', ')} onChange={(e) => setUserProfile({ ...userProfile, interests: e.target.value.split(',').map(i => i.trim()) })} />
-                  <input type="text" placeholder="Music (comma separated)" value={userProfile.music.join(', ')} onChange={(e) => setUserProfile({ ...userProfile, music: e.target.value.split(',').map(m => m.trim()) })} />
-                  <input type="text" placeholder="Campus Hotspots (e.g., Block 6, Library)" value={userProfile.campusHotspots.join(', ')} onChange={(e) => setUserProfile({ ...userProfile, campusHotspots: e.target.value.split(',').map(h => h.trim()) })} />
-                  <button className="btn-primary" onClick={createConnectionProfile}>Save Profile</button>
+                  <input type="text"placeholder="Interests (comma separated)"value={userProfile.interests.join(', ')} onChange={(e) => setUserProfile({ ...userProfile, interests: e.target.value.split(',').map(i => i.trim()) })} />
+                  <input type="text"placeholder="Music (comma separated)"value={userProfile.music.join(', ')} onChange={(e) => setUserProfile({ ...userProfile, music: e.target.value.split(',').map(m => m.trim()) })} />
+                  <input type="text"placeholder="Campus Hotspots (e.g., Block 6, Library)"value={userProfile.campusHotspots.join(', ')} onChange={(e) => setUserProfile({ ...userProfile, campusHotspots: e.target.value.split(',').map(h => h.trim()) })} />
+                  <button className="btn-primary"onClick={createConnectionProfile}>Save Profile</button>
                 </div>
               )}
 
@@ -1550,7 +1550,7 @@ function App() {
               {!showProfileForm && !showStatusForm && connectionProfiles.length > 0 && currentProfileIndex < connectionProfiles.length ? (
                 <div className="card-stack">
                   {connectionProfiles.slice(currentProfileIndex, currentProfileIndex + 1).map(profile => (
-                    <div key={profile._id} className="connection-card" onClick={() => calculateCompatibility(profile.user)}>
+                    <div key={profile._id} className="connection-card"onClick={() => calculateCompatibility(profile.user)}>
                       <div className="card-photo">
                         {profile.photos && profile.photos.length > 0 ? (
                           <img src={profile.photos[0]} alt={profile.displayName} />
@@ -1571,7 +1571,7 @@ function App() {
                           <div className="vibe-meter">
                             <div className="vibe-label">{compatibility.score}% Match</div>
                             <div className="vibe-progress">
-                              <div className="vibe-fill" style={{ width: `${compatibility.score}%` }}></div>
+                              <div className="vibe-fill"style={{ width: `${compatibility.score}%` }}></div>
                             </div>
                             <p className="vibe-reason">
                               {compatibility.common.interests?.length > 0 && `Both love ${compatibility.common.interests.slice(0, 2).join(', ')}`}
@@ -1593,8 +1593,8 @@ function App() {
                         </div>
                       </div>
                       <div className="card-actions">
-                        <button className="btn-pass" onClick={() => passProfile(profile.user)}>✕</button>
-                        <button className="btn-like" onClick={() => likeProfile(profile.user)}>❤️</button>
+                        <button className="btn-pass"onClick={() => passProfile(profile.user)}>✕</button>
+                        <button className="btn-like"onClick={() => likeProfile(profile.user)}>❤️</button>
                       </div>
                     </div>
                   ))}
@@ -1616,7 +1616,7 @@ function App() {
                       return (
                         <div key={match._id} className="match-card">
                           <div className="match-avatar">
-                            {otherUser.avatar ? <img src={otherUser.avatar} alt="" /> : <span>👤</span>}
+                            {otherUser.avatar ? <img src={otherUser.avatar} alt=""/> : <span>👤</span>}
                           </div>
                           <h4>{otherUser.displayName || otherUser.username}</h4>
                           <button className="btn-message">💬 Message</button>
@@ -1639,7 +1639,7 @@ function App() {
                     <p>{selectedFriend.status === 'online' ? '● Online' : '○ Offline'}</p>
                   </div>
                   <div className="chat-actions">
-                    <button className="icon-btn" onClick={() => blockUser(selectedFriend._id)}>🚫 Block</button>
+                    <button className="icon-btn"onClick={() => blockUser(selectedFriend._id)}>🚫 Block</button>
                   </div>
                 </div>
                 <div className="messages-container">
@@ -1664,8 +1664,8 @@ function App() {
                   )}
                 </div>
                 <div className="message-input-area">
-                  <input type="text" value={privateMessageInput} onChange={(e) => { setPrivateMessageInput(e.target.value); handleTypingStart(selectedFriend._id, false); }} onKeyPress={(e) => { if (e.key === 'Enter') { sendPrivateMessage(); handleTypingStop(selectedFriend._id, false); } }} onBlur={() => handleTypingStop(selectedFriend._id, false)} placeholder="Type a message..." />
-                  <button className="send-button" onClick={sendPrivateMessage}>Send</button>
+                  <input type="text"value={privateMessageInput} onChange={(e) => { setPrivateMessageInput(e.target.value); handleTypingStart(selectedFriend._id, false); }} onKeyPress={(e) => { if (e.key === 'Enter') { sendPrivateMessage(); handleTypingStop(selectedFriend._id, false); } }} onBlur={() => handleTypingStop(selectedFriend._id, false)} placeholder="Type a message..."/>
+                  <button className="send-button"onClick={sendPrivateMessage}>Send</button>
                 </div>
               </>
             ) : (
@@ -1681,7 +1681,7 @@ function App() {
             <div className="news-feed-container">
               <div className="news-feed-header">
                 <h2>📰 Campus Feed</h2>
-                <button className="btn-primary" onClick={() => setShowNewsForm(!showNewsForm)}>
+                <button className="btn-primary"onClick={() => setShowNewsForm(!showNewsForm)}>
                   {showNewsForm ? 'Cancel' : '✨ Create Post'}
                 </button>
               </div>
@@ -1689,21 +1689,21 @@ function App() {
                 <div className="post-creator">
                   <div className="post-creator-header">
                     <div className="post-creator-avatar">
-                      {editProfile.avatar ? <img src={editProfile.avatar} alt="" /> : <span>👤</span>}
+                      {editProfile.avatar ? <img src={editProfile.avatar} alt=""/> : <span>👤</span>}
                     </div>
                     <div className="post-creator-info">
                       <h4>{editProfile.displayName || username}</h4>
                       <p>Share your thoughts with the campus...</p>
                     </div>
                   </div>
-                  <textarea className="post-input" placeholder="What's on your mind?" value={newsPost.content} maxLength={500} onChange={(e) => setNewsPost({ ...newsPost, content: e.target.value })} />
+                  <textarea className="post-input"placeholder="What's on your mind?"value={newsPost.content} maxLength={500} onChange={(e) => setNewsPost({ ...newsPost, content: e.target.value })} />
                   <div className="post-input-footer">
                     <div className="char-counter">{newsPost.content.length}/500</div>
                     <div className="post-actions">
                       <button className="icon-btn-small">📷</button>
                       <button className="icon-btn-small">🎬</button>
                       <button className="icon-btn-small">📍</button>
-                      <button className="btn-primary btn-sm" onClick={createNewsPost}>Post</button>
+                      <button className="btn-primary btn-sm"onClick={createNewsPost}>Post</button>
                     </div>
                   </div>
                 </div>
@@ -1730,7 +1730,7 @@ function App() {
                       <p className="post-text">{post.content}</p>
                       {post.images && post.images.length > 0 && (
                         <div className={`post-images ${post.images.length === 1 ? 'single' : 'grid'}`}>
-                          {post.images.map((img, i) => <img key={i} src={img} alt="post" className="post-image" />)}
+                          {post.images.map((img, i) => <img key={i} src={img} alt="post"className="post-image"/>)}
                         </div>
                       )}
                       {post.tags && post.tags.length > 0 && (
@@ -1750,7 +1750,7 @@ function App() {
                         {showReactionPicker[post._id] && (
                           <div className="reaction-picker">
                             {['like', 'love', 'haha', 'wow', 'sad', 'angry'].map(reaction => (
-                              <button key={reaction} className="reaction-btn" onClick={() => reactToPost(post._id, reaction)}>
+                              <button key={reaction} className="reaction-btn"onClick={() => reactToPost(post._id, reaction)}>
                                 {reaction === 'like' && '👍'}
                                 {reaction === 'love' && '❤️'}
                                 {reaction === 'haha' && '😂'}
@@ -1762,15 +1762,15 @@ function App() {
                           </div>
                         )}
                       </div>
-                      <button className="action-btn" onClick={() => toggleComments(post._id)}>💬 Comment</button>
-                      <button className="action-btn" onClick={() => sharePost(post._id)}>🔗 Share</button>
+                      <button className="action-btn"onClick={() => toggleComments(post._id)}>💬 Comment</button>
+                      <button className="action-btn"onClick={() => sharePost(post._id)}>🔗 Share</button>
                     </div>
                     {showComments[post._id] && (
                       <div className="comments-section">
                         <div className="comment-input-wrapper">
                           <div className="comment-avatar"><span>👤</span></div>
-                          <input type="text" className="comment-input" placeholder="Write a comment..." value={newComment[post._id] || ''} onChange={(e) => setNewComment(prev => ({ ...prev, [post._id]: e.target.value }))} onKeyPress={(e) => e.key === 'Enter' && addComment(post._id)} />
-                          <button className="btn-send-comment" onClick={() => addComment(post._id)}>Send</button>
+                          <input type="text"className="comment-input"placeholder="Write a comment..."value={newComment[post._id] || ''} onChange={(e) => setNewComment(prev => ({ ...prev, [post._id]: e.target.value }))} onKeyPress={(e) => e.key === 'Enter' && addComment(post._id)} />
+                          <button className="btn-send-comment"onClick={() => addComment(post._id)}>Send</button>
                         </div>
                         <div className="comments-list">
                           {(postComments[post._id] || post.comments || []).filter(c => !c.parentId).map(comment => (
@@ -1783,15 +1783,15 @@ function App() {
                                 </div>
                                 <p className="comment-text">{comment.content}</p>
                                 <div className="comment-actions">
-                                  <button className="comment-like" onClick={() => likeComment(post._id, comment._id)}>
+                                  <button className="comment-like"onClick={() => likeComment(post._id, comment._id)}>
                                     {comment.likedBy?.includes(userId) ? '❤️' : '🤍'} {comment.likes || 0}
                                   </button>
-                                  <button className="comment-reply" onClick={() => setReplyingTo(prev => ({ ...prev, [post._id]: comment._id }))}>Reply</button>
+                                  <button className="comment-reply"onClick={() => setReplyingTo(prev => ({ ...prev, [post._id]: comment._id }))}>Reply</button>
                                 </div>
                                 {replyingTo[post._id] === comment._id && (
                                   <div className="reply-input-wrapper">
-                                    <input type="text" className="reply-input" placeholder="Write a reply..." value={newComment[`${post._id}_${comment._id}`] || ''} onChange={(e) => setNewComment(prev => ({ ...prev, [`${post._id}_${comment._id}`]: e.target.value }))} onKeyPress={(e) => e.key === 'Enter' && addComment(post._id, comment._id)} />
-                                    <button className="btn-send-reply" onClick={() => addComment(post._id, comment._id)}>Reply</button>
+                                    <input type="text"className="reply-input"placeholder="Write a reply..."value={newComment[`${post._id}_${comment._id}`] || ''} onChange={(e) => setNewComment(prev => ({ ...prev, [`${post._id}_${comment._id}`]: e.target.value }))} onKeyPress={(e) => e.key === 'Enter' && addComment(post._id, comment._id)} />
+                                    <button className="btn-send-reply"onClick={() => addComment(post._id, comment._id)}>Reply</button>
                                   </div>
                                 )}
                                 {(postComments[post._id] || post.comments || []).filter(c => c.parentId === comment._id).map(reply => (
@@ -1826,7 +1826,7 @@ function App() {
                 <div className="header-actions">
                   <button className={`view-toggle ${lostFoundView === 'list' ? 'active' : ''}`} onClick={() => setLostFoundView('list')}>📋 List</button>
                   <button className={`view-toggle ${lostFoundView === 'gallery' ? 'active' : ''}`} onClick={() => setLostFoundView('gallery')}>🖼️ Gallery</button>
-                  <button className="btn-primary" onClick={() => setShowLostFoundForm(!showLostFoundForm)}>{showLostFoundForm ? 'Cancel' : '+ I Found This'}</button>
+                  <button className="btn-primary"onClick={() => setShowLostFoundForm(!showLostFoundForm)}>{showLostFoundForm ? 'Cancel' : '+ I Found This'}</button>
                 </div>
               </div>
               {showLostFoundForm && (
@@ -1836,12 +1836,12 @@ function App() {
                     <option value="Found">I Found Something</option>
                     <option value="Lost">I Lost Something</option>
                   </select>
-                  <input type="text" placeholder="Item Title" value={lostFoundItem.title} onChange={(e) => setLostFoundItem({ ...lostFoundItem, title: e.target.value })} />
-                  <textarea placeholder="Description" value={lostFoundItem.description} onChange={(e) => setLostFoundItem({ ...lostFoundItem, description: e.target.value })} />
-                  <input type="text" placeholder="Location" value={lostFoundItem.location} onChange={(e) => setLostFoundItem({ ...lostFoundItem, location: e.target.value })} />
-                  <input type="date" value={lostFoundItem.date} onChange={(e) => setLostFoundItem({ ...lostFoundItem, date: e.target.value })} />
-                  <input type="text" placeholder="Contact Info" value={lostFoundItem.contactInfo} onChange={(e) => setLostFoundItem({ ...lostFoundItem, contactInfo: e.target.value })} />
-                  <input type="file" accept="image/*" multiple onChange={async (e) => {
+                  <input type="text"placeholder="Item Title"value={lostFoundItem.title} onChange={(e) => setLostFoundItem({ ...lostFoundItem, title: e.target.value })} />
+                  <textarea placeholder="Description"value={lostFoundItem.description} onChange={(e) => setLostFoundItem({ ...lostFoundItem, description: e.target.value })} />
+                  <input type="text"placeholder="Location"value={lostFoundItem.location} onChange={(e) => setLostFoundItem({ ...lostFoundItem, location: e.target.value })} />
+                  <input type="date"value={lostFoundItem.date} onChange={(e) => setLostFoundItem({ ...lostFoundItem, date: e.target.value })} />
+                  <input type="text"placeholder="Contact Info"value={lostFoundItem.contactInfo} onChange={(e) => setLostFoundItem({ ...lostFoundItem, contactInfo: e.target.value })} />
+                  <input type="file"accept="image/*"multiple onChange={async (e) => {
                     const files = Array.from(e.target.files);
                     const imagePromises = files.map(file => {
                       return new Promise((resolve) => {
@@ -1854,7 +1854,7 @@ function App() {
                     setLfImages(images);
                   }} />
                   {lfImages.length > 0 && <div className="image-preview">{lfImages.length} photo(s) selected</div>}
-                  <button className="btn-primary" onClick={createLostFoundItem}>Post</button>
+                  <button className="btn-primary"onClick={createLostFoundItem}>Post</button>
                 </div>
               )}
               {lostFoundView === 'gallery' ? (
@@ -1869,7 +1869,7 @@ function App() {
                         <h4>{item.title}</h4>
                         <p>{item.location}</p>
                         {item.status === 'FOUND' && item.type === 'Found' && (
-                          <button className="btn-claim" onClick={() => { setItemToClaim(item._id); setShowClaimModal(true); }}>🙋 Claim</button>
+                          <button className="btn-claim"onClick={() => { setItemToClaim(item._id); setShowClaimModal(true); }}>🙋 Claim</button>
                         )}
                       </div>
                     </div>
@@ -1890,14 +1890,14 @@ function App() {
                       <p>📞 {item.contactInfo}</p>
                       {item.images && item.images.length > 0 && (
                         <div className="lf-images">
-                          {item.images.map((img, i) => <img key={i} src={img} alt="item" />)}
+                          {item.images.map((img, i) => <img key={i} src={img} alt="item"/>)}
                         </div>
                       )}
                       {item.status === 'FOUND' && item.type === 'Found' && (
-                        <button className="btn-claim" onClick={() => { setItemToClaim(item._id); setShowClaimModal(true); }}>🙋 Claim This Item</button>
+                        <button className="btn-claim"onClick={() => { setItemToClaim(item._id); setShowClaimModal(true); }}>🙋 Claim This Item</button>
                       )}
                       {item.status === 'CLAIMED' && userId === item.user.toString() && (
-                        <button className="btn-return" onClick={() => returnItem(item._id)}>✓ Mark as Returned</button>
+                        <button className="btn-return"onClick={() => returnItem(item._id)}>✓ Mark as Returned</button>
                       )}
                     </div>
                   ))}
@@ -1912,7 +1912,7 @@ function App() {
               <div className="room-content-header">
                 <h2>💼 Campus Marketplace</h2>
                 <div className="header-actions">
-                  <input type="text" placeholder="Search items..." value={marketSearch} onChange={(e) => setMarketSearch(e.target.value)} className="search-input" />
+                  <input type="text"placeholder="Search items..."value={marketSearch} onChange={(e) => setMarketSearch(e.target.value)} className="search-input"/>
                   <select value={marketFilter} onChange={(e) => setMarketFilter(e.target.value)} className="filter-select">
                     <option value="All">All Categories</option>
                     <option value="Electronics">Electronics</option>
@@ -1922,15 +1922,15 @@ function App() {
                     <option value="Services">Services</option>
                     <option value="Other">Other</option>
                   </select>
-                  <button className="btn-primary" onClick={() => setShowMarketForm(!showMarketForm)}>{showMarketForm ? 'Cancel' : '+ Sell Item'}</button>
+                  <button className="btn-primary"onClick={() => setShowMarketForm(!showMarketForm)}>{showMarketForm ? 'Cancel' : '+ Sell Item'}</button>
                 </div>
               </div>
               {showMarketForm && (
                 <div className="form-container">
                   <h3>List an Item for Sale</h3>
-                  <input type="text" placeholder="Item Title" value={marketItem.title} onChange={(e) => setMarketItem({ ...marketItem, title: e.target.value })} />
-                  <textarea placeholder="Description" value={marketItem.description} onChange={(e) => setMarketItem({ ...marketItem, description: e.target.value })} />
-                  <input type="number" placeholder="Price (R)" value={marketItem.price} onChange={(e) => setMarketItem({ ...marketItem, price: e.target.value })} />
+                  <input type="text"placeholder="Item Title"value={marketItem.title} onChange={(e) => setMarketItem({ ...marketItem, title: e.target.value })} />
+                  <textarea placeholder="Description"value={marketItem.description} onChange={(e) => setMarketItem({ ...marketItem, description: e.target.value })} />
+                  <input type="number"placeholder="Price (R)"value={marketItem.price} onChange={(e) => setMarketItem({ ...marketItem, price: e.target.value })} />
                   <select value={marketItem.category} onChange={(e) => setMarketItem({ ...marketItem, category: e.target.value })}>
                     <option>Electronics</option>
                     <option>Textbooks</option>
@@ -1946,8 +1946,8 @@ function App() {
                     <option>Fair</option>
                     <option>Poor</option>
                   </select>
-                  <input type="text" placeholder="Contact Info" value={marketItem.contactInfo} onChange={(e) => setMarketItem({ ...marketItem, contactInfo: e.target.value })} />
-                  <input type="file" accept="image/*" multiple onChange={async (e) => {
+                  <input type="text"placeholder="Contact Info"value={marketItem.contactInfo} onChange={(e) => setMarketItem({ ...marketItem, contactInfo: e.target.value })} />
+                  <input type="file"accept="image/*"multiple onChange={async (e) => {
                     const files = Array.from(e.target.files);
                     const imagePromises = files.map(file => {
                       return new Promise((resolve) => {
@@ -1960,7 +1960,7 @@ function App() {
                     setMarketImages(images);
                   }} />
                   {marketImages.length > 0 && <div className="image-preview">{marketImages.length} photo(s) selected</div>}
-                  <button className="btn-primary" onClick={createMarketItem}>List Item</button>
+                  <button className="btn-primary"onClick={createMarketItem}>List Item</button>
                 </div>
               )}
               <div className="marketplace-grid">
@@ -1987,7 +1987,7 @@ function App() {
                       <p className="item-seller">Seller: {item.sellerName}</p>
                       <p className="item-contact">📞 {item.contactInfo}</p>
                       <div className="item-actions">
-                        <button className="btn-interested" onClick={() => markInterested(item._id)}>💬 Interested</button>
+                        <button className="btn-interested"onClick={() => markInterested(item._id)}>💬 Interested</button>
                         <span className={`item-status ${item.status}`}>{item.status}</span>
                       </div>
                     </div>
@@ -2002,14 +2002,14 @@ function App() {
             <div className="exam-prep-container">
               <div className="room-content-header">
                 <h2>📝 Exam Prep War Room</h2>
-                <button className="btn-primary" onClick={() => setShowThreadForm(!showThreadForm)}>{showThreadForm ? 'Cancel' : '+ New Thread'}</button>
+                <button className="btn-primary"onClick={() => setShowThreadForm(!showThreadForm)}>{showThreadForm ? 'Cancel' : '+ New Thread'}</button>
               </div>
               {showThreadForm && (
                 <div className="form-container">
                   <h3>Create Study Thread</h3>
-                  <input type="text" placeholder="Thread Title" value={examThread.title} onChange={(e) => setExamThread({ ...examThread, title: e.target.value })} />
-                  <textarea placeholder="Your Question" value={examThread.question} onChange={(e) => setExamThread({ ...examThread, question: e.target.value })} />
-                  <input type="file" accept="image/*" onChange={(e) => {
+                  <input type="text"placeholder="Thread Title"value={examThread.title} onChange={(e) => setExamThread({ ...examThread, title: e.target.value })} />
+                  <textarea placeholder="Your Question"value={examThread.question} onChange={(e) => setExamThread({ ...examThread, question: e.target.value })} />
+                  <input type="file"accept="image/*"onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
                       const reader = new FileReader();
@@ -2018,31 +2018,31 @@ function App() {
                     }
                   }} />
                   {threadImage && <div className="image-preview">Image attached</div>}
-                  <button className="btn-primary" onClick={createExamThread}>Create Thread</button>
+                  <button className="btn-primary"onClick={createExamThread}>Create Thread</button>
                 </div>
               )}
               <div className="exam-threads">
                 {examThreads.map(thread => (
                   <div key={thread._id} className="thread-card">
-                    <div className="thread-header" onClick={() => setActiveThreadId(activeThreadId === thread._id ? null : thread._id)}>
+                    <div className="thread-header"onClick={() => setActiveThreadId(activeThreadId === thread._id ? null : thread._id)}>
                       <h4>{thread.title}</h4>
                       <p>by {thread.authorName} • {thread.replies.length} replies</p>
                     </div>
                     {activeThreadId === thread._id && (
                       <div className="thread-content">
                         <p className="thread-question">{thread.question}</p>
-                        {thread.image && <img src={thread.image} alt="question" className="thread-image" />}
+                        {thread.image && <img src={thread.image} alt="question"className="thread-image"/>}
                         <div className="thread-replies">
                           {thread.replies.map((reply, i) => (
                             <div key={i} className="reply">
                               <strong>{reply.authorName}</strong>
                               <p>{reply.content}</p>
-                              {reply.image && <img src={reply.image} alt="reply" className="reply-image" />}
+                              {reply.image && <img src={reply.image} alt="reply"className="reply-image"/>}
                             </div>
                           ))}
                         </div>
                         <div className="reply-form">
-                          <input type="text" placeholder="Your reply..." value={threadReply} onChange={(e) => setThreadReply(e.target.value)} />
+                          <input type="text"placeholder="Your reply..."value={threadReply} onChange={(e) => setThreadReply(e.target.value)} />
                           <button onClick={() => replyToThread(thread._id)}>Reply</button>
                         </div>
                       </div>
@@ -2070,7 +2070,7 @@ function App() {
                     <div key={index} className={`message-bubble ${msg.senderId === userId ? 'own' : 'other'}`}>
                       <div className="message-author">{msg.senderName}</div>
                       {msg.messageType === 'voice' ? (
-                        <audio controls src={msg.content} className="voice-note" />
+                        <audio controls src={msg.content} className="voice-note"/>
                       ) : msg.fileName ? (
                         <div className="file-attachment"><span>📎</span> {msg.fileName}</div>
                       ) : (
@@ -2088,17 +2088,17 @@ function App() {
                 )}
               </div>
               <div className="message-input-area">
-                <input type="text" value={roomMessageInput} onChange={(e) => { setRoomMessageInput(e.target.value); handleTypingStart(currentRoom, true); }} onKeyPress={(e) => { if (e.key === 'Enter') { sendRoomMessage(); handleTypingStop(currentRoom, true); } }} onBlur={() => handleTypingStop(currentRoom, true)} placeholder={`Message #${currentRoom}...`} />
-                <button className="icon-btn-small" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>😀</button>
-                <button className="icon-btn-small" onClick={() => fileInputRef.current.click()}>📎</button>
+                <input type="text"value={roomMessageInput} onChange={(e) => { setRoomMessageInput(e.target.value); handleTypingStart(currentRoom, true); }} onKeyPress={(e) => { if (e.key === 'Enter') { sendRoomMessage(); handleTypingStop(currentRoom, true); } }} onBlur={() => handleTypingStop(currentRoom, true)} placeholder={`Message #${currentRoom}...`} />
+                <button className="icon-btn-small"onClick={() => setShowEmojiPicker(!showEmojiPicker)}>😀</button>
+                <button className="icon-btn-small"onClick={() => fileInputRef.current.click()}>📎</button>
                 <button className={`icon-btn-small ${recordingVoice ? 'recording' : ''}`} onClick={recordingVoice ? stopVoiceRecording : startVoiceRecording}>{recordingVoice ? '⏹️' : '🎤'}</button>
-                <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} />
-                <button className="send-button" onClick={sendRoomMessage}>Send</button>
+                <input type="file"ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} />
+                <button className="send-button"onClick={sendRoomMessage}>Send</button>
               </div>
               {showEmojiPicker && (
                 <div className="emoji-picker">
                   {emojis.map(emoji => (
-                    <button key={emoji} className="emoji-btn" onClick={() => addEmoji(emoji)}>{emoji}</button>
+                    <button key={emoji} className="emoji-btn"onClick={() => addEmoji(emoji)}>{emoji}</button>
                   ))}
                 </div>
               )}
@@ -2111,10 +2111,10 @@ function App() {
               <div className="room-content-header">
                 <h2>📚 Study Library</h2>
                 <div className="header-actions">
-                  <button className="btn-primary" onClick={() => setShowNdivhoAI(!showNdivhoAI)}>
+                  <button className="btn-primary"onClick={() => setShowNdivhoAI(!showNdivhoAI)}>
                     {showNdivhoAI ? 'Close Ndivho AI' : '🤖 Ask Ndivho AI'}
                   </button>
-                  <input type="text" placeholder="Search resources..." value={librarySearch} onChange={(e) => setLibrarySearch(e.target.value)} className="search-input" />
+                  <input type="text"placeholder="Search resources..."value={librarySearch} onChange={(e) => setLibrarySearch(e.target.value)} className="search-input"/>
                   <select value={libraryFilter} onChange={(e) => setLibraryFilter(e.target.value)} className="filter-select">
                     <option value="All">All Subjects</option>
                     <option value="Mathematics">Mathematics</option>
@@ -2124,14 +2124,14 @@ function App() {
                     <option value="Computer Science">Computer Science</option>
                     <option value="Other">Other</option>
                   </select>
-                  <button className="btn-primary" onClick={() => setShowResourceForm(!showResourceForm)}>{showResourceForm ? 'Cancel' : '+ Share Resource'}</button>
+                  <button className="btn-primary"onClick={() => setShowResourceForm(!showResourceForm)}>{showResourceForm ? 'Cancel' : '+ Share Resource'}</button>
                 </div>
               </div>
               {showResourceForm && (
                 <div className="form-container">
                   <h3>Share Study Resource</h3>
-                  <input type="text" placeholder="Resource Title" value={studyResource.title} onChange={(e) => setStudyResource({ ...studyResource, title: e.target.value })} />
-                  <textarea placeholder="Description" value={studyResource.description} onChange={(e) => setStudyResource({ ...studyResource, description: e.target.value })} />
+                  <input type="text"placeholder="Resource Title"value={studyResource.title} onChange={(e) => setStudyResource({ ...studyResource, title: e.target.value })} />
+                  <textarea placeholder="Description"value={studyResource.description} onChange={(e) => setStudyResource({ ...studyResource, description: e.target.value })} />
                   <select value={studyResource.subject} onChange={(e) => setStudyResource({ ...studyResource, subject: e.target.value })}>
                     <option>Mathematics</option>
                     <option>Physical Sciences</option>
@@ -2158,8 +2158,8 @@ function App() {
                     <option>Image</option>
                     <option>Other</option>
                   </select>
-                  <input type="text" placeholder="Tags (comma separated)" value={studyResource.tags} onChange={(e) => setStudyResource({ ...studyResource, tags: e.target.value })} />
-                  <input type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*" onChange={(e) => {
+                  <input type="text"placeholder="Tags (comma separated)"value={studyResource.tags} onChange={(e) => setStudyResource({ ...studyResource, tags: e.target.value })} />
+                  <input type="file"accept=".pdf,.doc,.docx,.ppt,.pptx,image/*"onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
                       const reader = new FileReader();
@@ -2171,7 +2171,7 @@ function App() {
                     }
                   }} />
                   {resourceFile && <div className="image-preview">📄 {studyResource.fileName} ({studyResource.fileSize})</div>}
-                  <button className="btn-primary" onClick={createStudyResource}>Share</button>
+                  <button className="btn-primary"onClick={createStudyResource}>Share</button>
                 </div>
               )}
               <div className="resources-list">
@@ -2192,8 +2192,8 @@ function App() {
                       )}
                     </div>
                     <div className="resource-actions">
-                      <button className="btn-like-resource" onClick={() => likeResource(resource._id)}>👍 {resource.likes}</button>
-                      <button className="btn-download" onClick={() => downloadResource(resource._id)}>📥 Download</button>
+                      <button className="btn-like-resource"onClick={() => likeResource(resource._id)}>👍 {resource.likes}</button>
+                      <button className="btn-download"onClick={() => downloadResource(resource._id)}>📥 Download</button>
                     </div>
                   </div>
                 ))}
@@ -2204,13 +2204,13 @@ function App() {
                 <div className="ndivho-ai-panel">
                   <div className="ndivho-ai-header">
                     <div className="ndivho-ai-avatar">
-                      <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                      <img src="/images/ndivho-avatar.jpg"alt="Ndivho"style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                     </div>
                     <div className="ndivho-ai-info">
                       <h3>Ndivho AI</h3>
                       <p>Your UNIVEN Study Assistant</p>
                     </div>
-                    <button className="close-ndivho-ai" onClick={() => setShowNdivhoAI(false)}>×</button>
+                    <button className="close-ndivho-ai"onClick={() => setShowNdivhoAI(false)}>×</button>
                   </div>
                   <div className="ndivho-ai-messages">
                     {ndivhoMessages.map((msg, i) => (
@@ -2260,66 +2260,66 @@ function App() {
 
       {/* Modals */}
       {showMatchPopup && (
-        <div className="modal-overlay" onClick={() => setShowMatchPopup(false)}>
-          <div className="match-popup" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay"onClick={() => setShowMatchPopup(false)}>
+          <div className="match-popup"onClick={(e) => e.stopPropagation()}>
             <div className="match-animation">💕</div>
             <h2>It's a Match!</h2>
             <p>You and {newMatch?.liked?.displayName} liked each other!</p>
-            <button className="btn-primary" onClick={() => setShowMatchPopup(false)}>Keep Swiping</button>
+            <button className="btn-primary"onClick={() => setShowMatchPopup(false)}>Keep Swiping</button>
           </div>
         </div>
       )}
 
       {showClaimModal && (
-        <div className="modal-overlay" onClick={() => setShowClaimModal(false)}>
-          <div className="modal-content-modern" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay"onClick={() => setShowClaimModal(false)}>
+          <div className="modal-content-modern"onClick={(e) => e.stopPropagation()}>
             <div className="modal-header-modern">
               <h2>🙋 Claim Item</h2>
-              <button className="close-modal" onClick={() => setShowClaimModal(false)}>×</button>
+              <button className="close-modal"onClick={() => setShowClaimModal(false)}>×</button>
             </div>
             <div className="modal-body">
               <p>Describe a unique detail about this item that wasn't in the photo (for verification):</p>
-              <textarea placeholder="e.g., There's a scratch on the bottom..." value={claimNotes} onChange={(e) => setClaimNotes(e.target.value)} rows="4" />
-              <button className="btn-primary" onClick={claimItem}>Submit Claim</button>
+              <textarea placeholder="e.g., There's a scratch on the bottom..."value={claimNotes} onChange={(e) => setClaimNotes(e.target.value)} rows="4"/>
+              <button className="btn-primary"onClick={claimItem}>Submit Claim</button>
             </div>
           </div>
         </div>
       )}
 
       {showProfile && (
-        <div className="modal-overlay" onClick={() => setShowProfile(false)}>
-          <div className="modal-content-modern" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay"onClick={() => setShowProfile(false)}>
+          <div className="modal-content-modern"onClick={(e) => e.stopPropagation()}>
             <div className="modal-header-modern">
               <h2>My Profile</h2>
-              <button className="close-modal" onClick={() => setShowProfile(false)}>×</button>
+              <button className="close-modal"onClick={() => setShowProfile(false)}>×</button>
             </div>
             <div className="modal-body">
               <div className="profile-avatar-section">
-                <div className="avatar-large">{editProfile.avatar ? <img src={editProfile.avatar} alt="" /> : <span>👤</span>}</div>
-                <input type="file" accept="image/*" onChange={handleAvatarUpload} id="avatar-input" className="file-input-hidden" />
-                <label htmlFor="avatar-input" className="change-avatar-btn">Change Photo</label>
+                <div className="avatar-large">{editProfile.avatar ? <img src={editProfile.avatar} alt=""/> : <span>👤</span>}</div>
+                <input type="file"accept="image/*"onChange={handleAvatarUpload} id="avatar-input"className="file-input-hidden"/>
+                <label htmlFor="avatar-input"className="change-avatar-btn">Change Photo</label>
               </div>
-              <div className="form-section"><label>Display Name</label><input type="text" value={editProfile.displayName} onChange={(e) => setEditProfile({ ...editProfile, displayName: e.target.value })} /></div>
-              <div className="form-section"><label>Email</label><input type="email" value={editProfile.email} onChange={(e) => setEditProfile({ ...editProfile, email: e.target.value })} /></div>
-              <div className="form-section"><label>Phone</label><input type="tel" value={editProfile.phone} onChange={(e) => setEditProfile({ ...editProfile, phone: e.target.value })} /></div>
-              <div className="form-section"><label>Bio</label><textarea value={editProfile.bio} onChange={(e) => setEditProfile({ ...editProfile, bio: e.target.value })} rows="3" /></div>
+              <div className="form-section"><label>Display Name</label><input type="text"value={editProfile.displayName} onChange={(e) => setEditProfile({ ...editProfile, displayName: e.target.value })} /></div>
+              <div className="form-section"><label>Email</label><input type="email"value={editProfile.email} onChange={(e) => setEditProfile({ ...editProfile, email: e.target.value })} /></div>
+              <div className="form-section"><label>Phone</label><input type="tel"value={editProfile.phone} onChange={(e) => setEditProfile({ ...editProfile, phone: e.target.value })} /></div>
+              <div className="form-section"><label>Bio</label><textarea value={editProfile.bio} onChange={(e) => setEditProfile({ ...editProfile, bio: e.target.value })} rows="3"/></div>
               <div className="form-section"><label>Level of Study</label><select value={editProfile.levelOfStudy} onChange={(e) => setEditProfile({ ...editProfile, levelOfStudy: e.target.value })}><option>First Year</option><option>Second Year</option><option>Third Year</option><option>Fourth Year</option><option>Honours</option><option>Masters</option><option>PhD</option></select></div>
-              <div className="form-section"><label>Degree Name</label><input type="text" value={editProfile.degreeName} onChange={(e) => setEditProfile({ ...editProfile, degreeName: e.target.value })} placeholder="e.g., BSc Computer Science" /></div>
+              <div className="form-section"><label>Degree Name</label><input type="text"value={editProfile.degreeName} onChange={(e) => setEditProfile({ ...editProfile, degreeName: e.target.value })} placeholder="e.g., BSc Computer Science"/></div>
               <div className="form-section"><label>Faculty</label><select value={editProfile.faculty} onChange={(e) => setEditProfile({ ...editProfile, faculty: e.target.value })}><option value="">Select Faculty</option><option>Agriculture, Science & Engineering</option><option>Commerce, Law & Management</option><option>Humanities, Social Sciences & Education</option><option>Health Sciences</option></select></div>
-              <button className="btn-primary btn-save" onClick={updateProfile}>Save Profile</button>
+              <button className="btn-primary btn-save"onClick={updateProfile}>Save Profile</button>
             </div>
           </div>
         </div>
       )}
 
       {showBlockConfirm && (
-        <div className="modal-overlay" onClick={() => setShowBlockConfirm(false)}>
-          <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay"onClick={() => setShowBlockConfirm(false)}>
+          <div className="confirm-modal"onClick={(e) => e.stopPropagation()}>
             <h3>Block User?</h3>
             <p>You won't receive messages from this user anymore.</p>
             <div className="confirm-actions">
-              <button className="btn-cancel" onClick={() => setShowBlockConfirm(false)}>Cancel</button>
-              <button className="btn-confirm-block" onClick={confirmBlockUser}>Block User</button>
+              <button className="btn-cancel"onClick={() => setShowBlockConfirm(false)}>Cancel</button>
+              <button className="btn-confirm-block"onClick={confirmBlockUser}>Block User</button>
             </div>
           </div>
         </div>

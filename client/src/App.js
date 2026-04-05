@@ -5,39 +5,56 @@ import "./App.css";
 const socket = io.connect("http://localhost:3001");
 
 function App() {
+  // === AUTH STATE ===
   const [showAuth, setShowAuth] = useState(true);
   const [isLogin, setIsLogin] = useState(true);
   const [authUsername, setAuthUsername] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authDisplayName, setAuthDisplayName] = useState("");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPhone, setAuthPhone] = useState("");
+  const [authGender, setAuthGender] = useState("Male");
+  const [authFaculty, setAuthFaculty] = useState("");
+  const [authLevelOfStudy, setAuthLevelOfStudy] = useState("First Year");
+  const [authRelationshipStatus, setAuthRelationshipStatus] = useState("Single");
+  const [authJoinMingle, setAuthJoinMingle] = useState(false);
   const [authError, setAuthError] = useState("");
-  
+
+  // === USER STATE ===
   const [userId, setUserId] = useState("");
   const [username, setUsername] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
-  
+  const [userGender, setUserGender] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [userPhone, setUserPhone] = useState("");
+
+  // === FRIENDS STATE ===
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [privateMessages, setPrivateMessages] = useState([]);
   const [privateMessageInput, setPrivateMessageInput] = useState("");
-  
+
+  // === ROOMS STATE ===
   const [rooms, setRooms] = useState([]);
   const [currentRoom, setCurrentRoom] = useState("cafeteria");
   const [roomMessages, setRoomMessages] = useState([]);
   const [roomMessageInput, setRoomMessageInput] = useState("");
-  
+
+  // === NAVIGATION STATE ===
   const [activeTab, setActiveTab] = useState("rooms");
   const [showProfile, setShowProfile] = useState(false);
   const [editProfile, setEditProfile] = useState({
-    displayName: "", bio: "", avatar: "", levelOfStudy: "", degreeName: "", faculty: "", race: "", ethnicGroup: ""
+    displayName: "", bio: "", avatar: "", levelOfStudy: "", degreeName: "", faculty: "", race: "", ethnicGroup: "", email: "", phone: ""
   });
-
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const [userToBlock, setUserToBlock] = useState(null);
 
-  // Campus Connections State
+  // === SINGLE & MINGLE STATE ===
   const [connectionProfiles, setConnectionProfiles] = useState([]);
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const [userProfile, setUserProfile] = useState({
@@ -48,8 +65,12 @@ function App() {
   const [compatibility, setCompatibility] = useState({ score: 0, common: {} });
   const [showMatchPopup, setShowMatchPopup] = useState(false);
   const [newMatch, setNewMatch] = useState(null);
+  const [mingleStatuses, setMingleStatuses] = useState([]);
+  const [showStatusForm, setShowStatusForm] = useState(false);
+  const [statusText, setStatusText] = useState("");
+  const [statusImage, setStatusImage] = useState(null);
 
-  // Lost & Found State
+  // === LOST & FOUND STATE ===
   const [lostFoundItems, setLostFoundItems] = useState([]);
   const [showLostFoundForm, setShowLostFoundForm] = useState(false);
   const [lostFoundView, setLostFoundView] = useState("list");
@@ -61,7 +82,7 @@ function App() {
   const [claimNotes, setClaimNotes] = useState("");
   const [lfImages, setLfImages] = useState([]);
 
-  // Marketplace State
+  // === MARKETPLACE STATE ===
   const [marketplaceItems, setMarketplaceItems] = useState([]);
   const [showMarketForm, setShowMarketForm] = useState(false);
   const [marketFilter, setMarketFilter] = useState("All");
@@ -72,7 +93,7 @@ function App() {
   const [marketImages, setMarketImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState({});
 
-  // Library State
+  // === LIBRARY STATE ===
   const [studyResources, setStudyResources] = useState([]);
   const [showResourceForm, setShowResourceForm] = useState(false);
   const [libraryFilter, setLibraryFilter] = useState("All");
@@ -82,13 +103,13 @@ function App() {
   });
   const [resourceFile, setResourceFile] = useState(null);
 
-  // News Feed State
+  // === NEWS FEED STATE ===
   const [newsPosts, setNewsPosts] = useState([]);
   const [showNewsForm, setShowNewsForm] = useState(false);
   const [newsPost, setNewsPost] = useState({ content: "", images: [], tags: "" });
   const [newsImages, setNewsImages] = useState([]);
 
-  // Exam Prep State
+  // === EXAM PREP STATE ===
   const [examThreads, setExamThreads] = useState([]);
   const [showThreadForm, setShowThreadForm] = useState(false);
   const [examThread, setExamThread] = useState({ title: "", question: "", image: "" });
@@ -96,11 +117,11 @@ function App() {
   const [activeThreadId, setActiveThreadId] = useState(null);
   const [threadReply, setThreadReply] = useState("");
 
-  // Typing Indicators State
+  // === TYPING INDICATORS STATE ===
   const [typingUsers, setTypingUsers] = useState({});
   const typingTimeout = useRef({});
 
-  // News Feed Enhanced State
+  // === NEWS FEED ENHANCED STATE ===
   const [postReactions, setPostReactions] = useState({});
   const [postComments, setPostComments] = useState({});
   const [showComments, setShowComments] = useState({});
@@ -108,7 +129,7 @@ function App() {
   const [replyingTo, setReplyingTo] = useState({});
   const [showReactionPicker, setShowReactionPicker] = useState({});
 
-  // Ndivho AI State (Library Popup)
+  // === NDIVHO AI STATE ===
   const [showNdivhoAI, setShowNdivhoAI] = useState(false);
   const [ndivhoMessages, setNdivhoMessages] = useState([
     { sender: 'bot', text: "Hey! I am Ndivho AI 🤖 How can I help you today?", timestamp: new Date() }
@@ -116,16 +137,16 @@ function App() {
   const [ndivhoInput, setNdivhoInput] = useState("");
   const [isAITyping, setIsAITyping] = useState(false);
 
-  // AI ROOM State (Standalone Feature)
+  // === AI ROOM STATE ===
   const [aiRoomActive, setAiRoomActive] = useState(false);
   const [aiMessages, setAiMessages] = useState([
-    { sender: 'bot', text: "Hey! I am Ndivho AI 🤖 How can I help you today?\n\nI can help with:\n📚 Any UNIVEN module\n📝 Exam preparation\n💡 Study tips\n⏰ Time management\n💪 Motivation\n\nJust ask me anything!", timestamp: new Date() }
+    { sender: 'bot', text: "Hey! I am Ndivho AI 🤖 How can I help you today?", timestamp: new Date() }
   ]);
   const [aiInput, setAiInput] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [aiModuleCode, setAiModuleCode] = useState("");
 
-  // UI State
+  // === UI STATE ===
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [recordingVoice, setRecordingVoice] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -133,13 +154,24 @@ function App() {
 
   const emojis = ["😀", "😂", "😍", "🤔", "👍", "❤️", "🎉", "🔥", "👏", "🙏", "💯", "✨", "📚", "🎓", "💼", "🛒"];
 
-  // Auth Functions
+  // === AUTH FUNCTIONS ===
   const handleRegister = async () => {
     try {
       const response = await fetch('http://localhost:3001/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: authUsername, password: authPassword, displayName: authDisplayName })
+        body: JSON.stringify({
+          username: authUsername,
+          password: authPassword,
+          displayName: authDisplayName,
+          email: authEmail,
+          phone: authPhone,
+          gender: authGender,
+          faculty: authFaculty,
+          levelOfStudy: authLevelOfStudy,
+          relationshipStatus: authRelationshipStatus,
+          joinMingle: authJoinMingle
+        })
       });
       const data = await response.json();
       if (data.error) setAuthError(data.error);
@@ -147,7 +179,9 @@ function App() {
         alert('Registration successful! Please login. ✅');
         setIsLogin(true);
       }
-    } catch (error) { setAuthError('Registration failed'); }
+    } catch (error) {
+      setAuthError('Registration failed');
+    }
   };
 
   const handleLogin = async () => {
@@ -163,8 +197,13 @@ function App() {
         setUserId(data.user.id);
         setUsername(data.user.username);
         setCurrentUser(data.user);
+        setUserGender(data.user.gender || "Male");
+        setUserEmail(data.user.email || "");
+        setUserPhone(data.user.phone || "");
         setShowAuth(false);
         socket.emit("register_user", data.user.id);
+        
+        // Fetch all data for logged-in user
         fetchRooms();
         fetchFriends(data.user.id);
         fetchFriendRequests(data.user.id);
@@ -178,18 +217,47 @@ function App() {
         fetchExamThreads();
         fetchConnectionProfiles();
         fetchMatches(data.user.id);
+        fetchMingleStatuses();
       }
-    } catch (error) { setAuthError('Login failed'); }
+    } catch (error) {
+      setAuthError('Login failed');
+    }
   };
 
-  // Room Functions
+  const handleLogout = () => {
+    // Clear all state to prevent data leakage
+    setUserId("");
+    setUsername("");
+    setCurrentUser(null);
+    setUserGender("");
+    setUserEmail("");
+    setUserPhone("");
+    setFriends([]);
+    setFriendRequests([]);
+    setAllUsers([]);
+    setSearchResults([]);
+    setShowSearchResults(false);
+    setSelectedFriend(null);
+    setPrivateMessages([]);
+    setRoomMessages([]);
+    setConnectionProfiles([]);
+    setMatches([]);
+    setMingleStatuses([]);
+    setShowAuth(true);
+    setActiveTab("rooms");
+    setSearchQuery("");
+  };
+
+  // === ROOM FUNCTIONS ===
   const fetchRooms = async () => {
     try {
       const response = await fetch('http://localhost:3001/api/rooms');
       const data = await response.json();
       setRooms(data);
       if (data.length > 0) setCurrentRoom(data[0].id);
-    } catch (error) { console.error('Error fetching rooms:', error); }
+    } catch (error) {
+      console.error('Error fetching rooms:', error);
+    }
   };
 
   const joinRoom = (roomId) => {
@@ -267,13 +335,39 @@ function App() {
     }
   };
 
-  // Lost & Found Functions
+  // === USER SEARCH FUNCTIONS ===
+  const searchUsers = async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+    
+    try {
+      const allUsersResponse = await fetch('http://localhost:3001/api/users');
+      const allUsersData = await allUsersResponse.json();
+      
+      const filtered = allUsersData.filter(user => 
+        user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.displayName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      
+      setSearchResults(filtered.filter(u => u._id !== userId));
+      setShowSearchResults(true);
+    } catch (error) {
+      console.error('Error searching users:', error);
+    }
+  };
+
+  // === LOST & FOUND FUNCTIONS ===
   const fetchLostFoundItems = async () => {
     try {
       const response = await fetch('http://localhost:3001/api/lost-found');
       const data = await response.json();
       setLostFoundItems(data);
-    } catch (error) { console.error('Error fetching lost & found:', error); }
+    } catch (error) {
+      console.error('Error fetching lost & found:', error);
+    }
   };
 
   const createLostFoundItem = async () => {
@@ -289,7 +383,9 @@ function App() {
       setLostFoundItem({ type: "Found", title: "", description: "", location: "", date: "", images: [], contactInfo: "" });
       setLfImages([]);
       fetchLostFoundItems();
-    } catch (error) { console.error('Error creating item:', error); }
+    } catch (error) {
+      console.error('Error creating item:', error);
+    }
   };
 
   const claimItem = async () => {
@@ -304,7 +400,9 @@ function App() {
       setItemToClaim(null);
       setClaimNotes("");
       fetchLostFoundItems();
-    } catch (error) { console.error('Error claiming item:', error); }
+    } catch (error) {
+      console.error('Error claiming item:', error);
+    }
   };
 
   const returnItem = async (itemId) => {
@@ -312,17 +410,21 @@ function App() {
       await fetch(`http://localhost:3001/api/lost-found/${itemId}/return`, { method: 'PUT' });
       alert('Item marked as returned! ✅');
       fetchLostFoundItems();
-    } catch (error) { console.error('Error returning item:', error); }
+    } catch (error) {
+      console.error('Error returning item:', error);
+    }
   };
 
-  // Marketplace Functions
+  // === MARKETPLACE FUNCTIONS ===
   const fetchMarketplaceItems = async () => {
     try {
       const query = `?category=${marketFilter}&search=${marketSearch}`;
       const response = await fetch(`http://localhost:3001/api/marketplace${query}`);
       const data = await response.json();
       setMarketplaceItems(data);
-    } catch (error) { console.error('Error fetching marketplace:', error); }
+    } catch (error) {
+      console.error('Error fetching marketplace:', error);
+    }
   };
 
   useEffect(() => {
@@ -342,7 +444,9 @@ function App() {
       setMarketItem({ title: "", description: "", price: "", category: "Other", condition: "Good", images: [], contactInfo: "" });
       setMarketImages([]);
       fetchMarketplaceItems();
-    } catch (error) { console.error('Error creating item:', error); }
+    } catch (error) {
+      console.error('Error creating item:', error);
+    }
   };
 
   const markInterested = async (itemId) => {
@@ -354,7 +458,9 @@ function App() {
       });
       alert('Seller notified of your interest! 💬');
       fetchMarketplaceItems();
-    } catch (error) { console.error('Error marking interested:', error); }
+    } catch (error) {
+      console.error('Error marking interested:', error);
+    }
   };
 
   const nextImage = (itemId, max) => {
@@ -371,14 +477,16 @@ function App() {
     }));
   };
 
-  // Library Functions
+  // === LIBRARY FUNCTIONS ===
   const fetchStudyResources = async () => {
     try {
       const query = `?subject=${libraryFilter}&search=${librarySearch}`;
       const response = await fetch(`http://localhost:3001/api/study-resources${query}`);
       const data = await response.json();
       setStudyResources(data);
-    } catch (error) { console.error('Error fetching resources:', error); }
+    } catch (error) {
+      console.error('Error fetching resources:', error);
+    }
   };
 
   useEffect(() => {
@@ -404,7 +512,9 @@ function App() {
       setStudyResource({ title: "", description: "", subject: "Other", gradeLevel: "First Year", fileType: "PDF", fileUrl: "", fileName: "", fileSize: "", tags: "" });
       setResourceFile(null);
       fetchStudyResources();
-    } catch (error) { console.error('Error creating resource:', error); }
+    } catch (error) {
+      console.error('Error creating resource:', error);
+    }
   };
 
   const likeResource = async (id) => {
@@ -415,7 +525,9 @@ function App() {
         body: JSON.stringify({ userId })
       });
       fetchStudyResources();
-    } catch (error) { console.error('Error liking resource:', error); }
+    } catch (error) {
+      console.error('Error liking resource:', error);
+    }
   };
 
   const downloadResource = async (id) => {
@@ -423,16 +535,20 @@ function App() {
       await fetch(`http://localhost:3001/api/study-resources/${id}/download`, { method: 'PUT' });
       alert('Download started! 📥');
       fetchStudyResources();
-    } catch (error) { console.error('Error downloading:', error); }
+    } catch (error) {
+      console.error('Error downloading:', error);
+    }
   };
 
-  // News Feed Functions
+  // === NEWS FEED FUNCTIONS ===
   const fetchNewsPosts = async () => {
     try {
       const response = await fetch('http://localhost:3001/api/news');
       const data = await response.json();
       setNewsPosts(data);
-    } catch (error) { console.error('Error fetching news:', error); }
+    } catch (error) {
+      console.error('Error fetching news:', error);
+    }
   };
 
   const createNewsPost = async () => {
@@ -454,16 +570,20 @@ function App() {
       setNewsPost({ content: "", images: [], tags: "" });
       setNewsImages([]);
       fetchNewsPosts();
-    } catch (error) { console.error('Error creating post:', error); }
+    } catch (error) {
+      console.error('Error creating post:', error);
+    }
   };
 
-  // Exam Prep Functions
+  // === EXAM PREP FUNCTIONS ===
   const fetchExamThreads = async () => {
     try {
       const response = await fetch(`http://localhost:3001/api/exam-threads/exam-prep`);
       const data = await response.json();
       setExamThreads(data);
-    } catch (error) { console.error('Error fetching threads:', error); }
+    } catch (error) {
+      console.error('Error fetching threads:', error);
+    }
   };
 
   const createExamThread = async () => {
@@ -485,7 +605,9 @@ function App() {
       setExamThread({ title: "", question: "", image: "" });
       setThreadImage(null);
       fetchExamThreads();
-    } catch (error) { console.error('Error creating thread:', error); }
+    } catch (error) {
+      console.error('Error creating thread:', error);
+    }
   };
 
   const replyToThread = async (threadId) => {
@@ -501,16 +623,20 @@ function App() {
       });
       setThreadReply("");
       fetchExamThreads();
-    } catch (error) { console.error('Error replying:', error); }
+    } catch (error) {
+      console.error('Error replying:', error);
+    }
   };
 
-  // Friend Functions
+  // === FRIEND FUNCTIONS ===
   const fetchFriends = async (uid) => {
     try {
       const response = await fetch(`http://localhost:3001/api/friends/${uid}`);
       const data = await response.json();
       setFriends(data);
-    } catch (error) { console.error('Error fetching friends:', error); }
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+    }
   };
 
   const fetchFriendRequests = async (uid) => {
@@ -518,15 +644,19 @@ function App() {
       const response = await fetch(`http://localhost:3001/api/friend-requests/${uid}`);
       const data = await response.json();
       setFriendRequests(data);
-    } catch (error) { console.error('Error fetching requests:', error); }
+    } catch (error) {
+      console.error('Error fetching requests:', error);
+    }
   };
 
   const fetchAllUsers = async () => {
     try {
       const response = await fetch('http://localhost:3001/api/users');
       const data = await response.json();
-      setAllUsers(data.filter(u => u.username !== authUsername));
-    } catch (error) { console.error('Error fetching users:', error); }
+      setAllUsers(data.filter(u => u.username !== username));
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
   };
 
   const sendFriendRequest = async (receiverId) => {
@@ -538,7 +668,9 @@ function App() {
       });
       alert('Friend request sent!');
       fetchFriendRequests(userId);
-    } catch (error) { console.error('Error sending request:', error); }
+    } catch (error) {
+      console.error('Error sending request:', error);
+    }
   };
 
   const handleFriendRequest = async (requestId, status) => {
@@ -550,7 +682,9 @@ function App() {
       });
       fetchFriendRequests(userId);
       if (status === 'accepted') fetchFriends(userId);
-    } catch (error) { console.error('Error handling request:', error); }
+    } catch (error) {
+      console.error('Error handling request:', error);
+    }
   };
 
   const blockUser = (blockedUserId) => {
@@ -569,7 +703,10 @@ function App() {
       alert('User blocked successfully');
       setShowBlockConfirm(false);
       setUserToBlock(null);
-    } catch (error) { console.error('Error blocking:', error); alert('Failed to block user'); }
+    } catch (error) {
+      console.error('Error blocking:', error);
+      alert('Failed to block user');
+    }
   };
 
   const selectFriend = async (friend) => {
@@ -578,7 +715,9 @@ function App() {
       const response = await fetch(`http://localhost:3001/api/messages/${userId}/${friend._id}`);
       const data = await response.json();
       setPrivateMessages(data);
-    } catch (error) { console.error('Error fetching messages:', error); }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
   };
 
   const sendPrivateMessage = async () => {
@@ -595,6 +734,376 @@ function App() {
     socket.emit("mark_read", { messageId });
   };
 
+  // === SINGLE & MINGLE FUNCTIONS ===
+  const fetchConnectionProfiles = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/connections');
+      const data = await response.json();
+      setConnectionProfiles(data.filter(p => p.user.toString() !== userId));
+    } catch (error) {
+      console.error('Error fetching connections:', error);
+    }
+  };
+
+  const fetchMatches = async (uid) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/connections/matches/${uid}`);
+      const data = await response.json();
+      setMatches(data);
+    } catch (error) {
+      console.error('Error fetching matches:', error);
+    }
+  };
+
+  const createConnectionProfile = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/connections/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, username, ...userProfile })
+      });
+      await response.json();
+      alert('Profile created! ✅');
+      setShowProfileForm(false);
+      fetchConnectionProfiles();
+    } catch (error) {
+      console.error('Error creating profile:', error);
+    }
+  };
+
+  const likeProfile = async (likedId) => {
+    try {
+      const response = await fetch('http://localhost:3001/api/connections/like', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ likerId: userId, likedId })
+      });
+      const data = await response.json();
+      if (data.match) {
+        setNewMatch(data);
+        setShowMatchPopup(true);
+        fetchMatches(userId);
+      }
+      setCurrentProfileIndex(prev => prev + 1);
+    } catch (error) {
+      console.error('Error liking:', error);
+    }
+  };
+
+  const passProfile = async (passedId) => {
+    try {
+      await fetch('http://localhost:3001/api/connections/pass', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passerId: userId, passedId })
+      });
+      setCurrentProfileIndex(prev => prev + 1);
+    } catch (error) {
+      console.error('Error passing:', error);
+    }
+  };
+
+  const calculateCompatibility = async (profileId) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/connections/compatibility/${userId}/${profileId}`);
+      const data = await response.json();
+      setCompatibility(data);
+    } catch (error) {
+      console.error('Error calculating compatibility:', error);
+    }
+  };
+
+  // === MINGLE STATUS FUNCTIONS ===
+  const fetchMingleStatuses = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/mingle/statuses?userId=${userId}`);
+      const data = await response.json();
+      setMingleStatuses(data);
+    } catch (error) {
+      console.error('Error fetching statuses:', error);
+    }
+  };
+
+  const createMingleStatus = async () => {
+    if (!statusText.trim() && !statusImage) {
+      alert('Please add text or an image');
+      return;
+    }
+    
+    try {
+      const formData = new FormData();
+      formData.append('userId', userId);
+      formData.append('username', username);
+      formData.append('text', statusText);
+      if (statusImage) {
+        formData.append('image', statusImage);
+      }
+      
+      const response = await fetch('http://localhost:3001/api/mingle/status', {
+        method: 'POST',
+        body: formData
+      });
+      
+      await response.json();
+      alert('Status posted! ✅');
+      setShowStatusForm(false);
+      setStatusText("");
+      setStatusImage(null);
+      fetchMingleStatuses();
+    } catch (error) {
+      console.error('Error creating status:', error);
+      alert('Failed to post status');
+    }
+  };
+
+  // === TYPING INDICATOR FUNCTIONS ===
+  const handleTypingStart = (targetId, isRoom = false) => {
+    const key = isRoom ? `room_${currentRoom}_${userId}` : `private_${targetId}_${userId}`;
+    if (typingTimeout.current[key]) clearTimeout(typingTimeout.current[key]);
+    else {
+      if (isRoom) socket.emit("typing_start", { roomId: currentRoom, senderId: userId, senderName: username });
+      else socket.emit("typing_start", { receiverId: targetId, senderId: userId, senderName: username });
+    }
+    typingTimeout.current[key] = setTimeout(() => handleTypingStop(targetId, isRoom), 2000);
+  };
+
+  const handleTypingStop = (targetId, isRoom = false) => {
+    const key = isRoom ? `room_${currentRoom}_${userId}` : `private_${targetId}_${userId}`;
+    if (typingTimeout.current[key]) {
+      clearTimeout(typingTimeout.current[key]);
+      delete typingTimeout.current[key];
+    }
+    if (isRoom) socket.emit("typing_stop", { roomId: currentRoom, senderId: userId, senderName: username });
+    else socket.emit("typing_stop", { receiverId: targetId, senderId: userId, senderName: username });
+  };
+
+  // === NEWS FEED ENHANCED FUNCTIONS ===
+  const formatTimeAgo = (date) => {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    if (seconds < 60) return 'just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d ago`;
+    return new Date(date).toLocaleDateString();
+  };
+
+  const reactToPost = async (postId, reaction) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/news/${postId}/react`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, reaction })
+      });
+      const updatedPost = await response.json();
+      setPostReactions(prev => ({ ...prev, [postId]: updatedPost.reactionCounts }));
+      setShowReactionPicker(prev => ({ ...prev, [postId]: false }));
+    } catch (error) {
+      console.error('Error reacting:', error);
+    }
+  };
+
+  const addComment = async (postId, parentId = null) => {
+    const content = parentId ? (newComment[`${postId}_${parentId}`] || '').trim() : (newComment[postId] || '').trim();
+    if (!content) return;
+    try {
+      const response = await fetch(`http://localhost:3001/api/news/${postId}/comment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, username, content, parentId })
+      });
+      const comment = await response.json();
+      setPostComments(prev => ({ ...prev, [postId]: [...(prev[postId] || []), comment] }));
+      if (parentId) {
+        setNewComment(prev => ({ ...prev, [`${postId}_${parentId}`]: '' }));
+        setReplyingTo(prev => ({ ...prev, [postId]: null }));
+      } else {
+        setNewComment(prev => ({ ...prev, [postId]: '' }));
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
+
+  const likeComment = async (postId, commentId) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/news/${postId}/comment/${commentId}/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const updatedComment = await response.json();
+      setPostComments(prev => ({ ...prev, [postId]: prev[postId]?.map(c => c._id === commentId ? updatedComment : c) || [] }));
+    } catch (error) {
+      console.error('Error liking comment:', error);
+    }
+  };
+
+  const sharePost = async (postId) => {
+    try {
+      await fetch(`http://localhost:3001/api/news/${postId}/share`, { method: 'POST' });
+      alert('Post shared! 🔗');
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  const toggleComments = (postId) => {
+    setShowComments(prev => ({ ...prev, [postId]: !prev[postId] }));
+    if (!showComments[postId]) fetchPostComments(postId);
+  };
+
+  const fetchPostComments = async (postId) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/news/${postId}/comments`);
+      const comments = await response.json();
+      setPostComments(prev => ({ ...prev, [postId]: comments }));
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
+
+  const getReactionsSummary = (counts) => {
+    if (!counts) return '';
+    const reactions = Object.entries(counts).filter(([_, count]) => count > 0).map(([type, count]) => {
+      const emojis = { like: '👍', love: '❤️', haha: '😂', wow: '😮', sad: '😢', angry: '😡' };
+      return `${emojis[type] || '👍'} ${count}`;
+    });
+    return reactions.join(' ');
+  };
+
+  // === NDIVHO AI FUNCTIONS ===
+  const sendToNdivhoAI = async () => {
+    if (!ndivhoInput.trim()) return;
+    const userMessage = ndivhoInput.trim();
+    setNdivhoMessages(prev => [...prev, { sender: 'user', text: userMessage, timestamp: new Date() }]);
+    setNdivhoInput("");
+    setIsAITyping(true);
+    try {
+      const response = await fetch('http://localhost:3001/api/ndivho-ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage })
+      });
+      const data = await response.json();
+      setTimeout(() => {
+        setNdivhoMessages(prev => [...prev, { sender: 'bot', text: data.response, timestamp: data.timestamp }]);
+        setIsAITyping(false);
+      }, 1000);
+    } catch (error) {
+      console.error('Error:', error);
+      setIsAITyping(false);
+    }
+  };
+
+  // === AI ROOM FUNCTIONS ===
+  const sendToAI = async () => {
+    if (!aiInput.trim()) return;
+    const userMessage = aiInput.trim();
+    setAiMessages(prev => [...prev, { sender: 'user', text: userMessage, timestamp: new Date() }]);
+    setAiInput("");
+    setIsAiTyping(true);
+    try {
+      const response = await fetch('http://localhost:3001/api/ndivho-ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage, userId, moduleCode: aiModuleCode })
+      });
+      const data = await response.json();
+      setTimeout(() => {
+        setAiMessages(prev => [...prev, { sender: 'bot', text: data.response, timestamp: data.timestamp }]);
+        setIsAiTyping(false);
+      }, 1000);
+    } catch (error) {
+      console.error('Error:', error);
+      setIsAiTyping(false);
+    }
+  };
+
+  const handleAiFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('title', file.name.split('.')[0]);
+    formData.append('moduleCode', aiModuleCode || 'GENERAL');
+    formData.append('userId', userId);
+    formData.append('uploaderName', username);
+    formData.append('uploaderRole', 'founder');
+
+    try {
+      const response = await fetch('http://localhost:3001/api/study-guides/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const result = await response.json();
+      if (response.ok) {
+        alert(result.message);
+        setAiMessages(prev => [...prev, {
+          sender: 'bot',
+          text: `✅ ${result.message}`,
+          timestamp: new Date()
+        }]);
+      } else {
+        alert(`❌ Upload failed: ${result.error}`);
+      }
+      e.target.value = '';
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('❌ Upload failed.');
+    }
+  };
+
+  // === PROFILE FUNCTIONS ===
+  const fetchUserProfile = async (username) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/profile/${username}`);
+      const user = await response.json();
+      setEditProfile({
+        displayName: user.displayName || "",
+        bio: user.bio || "",
+        avatar: user.avatar || "",
+        levelOfStudy: user.levelOfStudy || "First Year",
+        degreeName: user.degreeName || "",
+        faculty: user.faculty || "",
+        race: user.race || "",
+        ethnicGroup: user.ethnicGroup || "",
+        email: user.email || "",
+        phone: user.phone || ""
+      });
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  const handleAvatarUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setEditProfile({ ...editProfile, avatar: reader.result });
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const updateProfile = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/profile/${username}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editProfile)
+      });
+      const updatedUser = await response.json();
+      setCurrentUser(updatedUser);
+      setShowProfile(false);
+      alert('Profile updated! ✅');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  };
+
+  // === SOCKET EVENT LISTENERS ===
   useEffect(() => {
     socket.on("receive_room_message", (message) => {
       if (message.roomId === currentRoom) setRoomMessages(prev => [...prev, message]);
@@ -620,286 +1129,7 @@ function App() {
     };
   }, [currentRoom, selectedFriend]);
 
-  const fetchUserProfile = async (username) => {
-    try {
-      const response = await fetch(`http://localhost:3001/api/profile/${username}`);
-      const user = await response.json();
-      setEditProfile({
-        displayName: user.displayName || "", bio: user.bio || "", avatar: user.avatar || "",
-        levelOfStudy: user.levelOfStudy || "First Year", degreeName: user.degreeName || "",
-        faculty: user.faculty || "", race: user.race || "", ethnicGroup: user.ethnicGroup || ""
-      });
-    } catch (error) { console.error('Error fetching profile:', error); }
-  };
-
-  const handleAvatarUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setEditProfile({...editProfile, avatar: reader.result});
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const updateProfile = async () => {
-    try {
-      const response = await fetch(`http://localhost:3001/api/profile/${authUsername}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editProfile)
-      });
-      const updatedUser = await response.json();
-      setCurrentUser(updatedUser);
-      setShowProfile(false);
-      alert('Profile updated! ✅');
-    } catch (error) { console.error('Error updating profile:', error); }
-  };
-
-  // Campus Connections Functions
-  const fetchConnectionProfiles = async () => {
-    try {
-      const response = await fetch('http://localhost:3001/api/connections');
-      const data = await response.json();
-      setConnectionProfiles(data.filter(p => p.user.toString() !== userId));
-    } catch (error) { console.error('Error fetching connections:', error); }
-  };
-
-  const fetchMatches = async (uid) => {
-    try {
-      const response = await fetch(`http://localhost:3001/api/connections/matches/${uid}`);
-      const data = await response.json();
-      setMatches(data);
-    } catch (error) { console.error('Error fetching matches:', error); }
-  };
-
-  const createConnectionProfile = async () => {
-    try {
-      const response = await fetch('http://localhost:3001/api/connections/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, username, ...userProfile })
-      });
-      await response.json();
-      alert('Profile created! ✅');
-      setShowProfileForm(false);
-      fetchConnectionProfiles();
-    } catch (error) { console.error('Error creating profile:', error); }
-  };
-
-  const likeProfile = async (likedId) => {
-    try {
-      const response = await fetch('http://localhost:3001/api/connections/like', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ likerId: userId, likedId })
-      });
-      const data = await response.json();
-      if (data.match) {
-        setNewMatch(data);
-        setShowMatchPopup(true);
-        fetchMatches(userId);
-      }
-      setCurrentProfileIndex(prev => prev + 1);
-    } catch (error) { console.error('Error liking:', error); }
-  };
-
-  const passProfile = async (passedId) => {
-    try {
-      await fetch('http://localhost:3001/api/connections/pass', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ passerId: userId, passedId })
-      });
-      setCurrentProfileIndex(prev => prev + 1);
-    } catch (error) { console.error('Error passing:', error); }
-  };
-
-  const calculateCompatibility = async (profileId) => {
-    try {
-      const response = await fetch(`http://localhost:3001/api/connections/compatibility/${userId}/${profileId}`);
-      const data = await response.json();
-      setCompatibility(data);
-    } catch (error) { console.error('Error calculating compatibility:', error); }
-  };
-
-  // Typing Indicator Functions
-  const handleTypingStart = (targetId, isRoom = false) => {
-    const key = isRoom ? `room_${currentRoom}_${userId}` : `private_${targetId}_${userId}`;
-    if (typingTimeout.current[key]) clearTimeout(typingTimeout.current[key]);
-    else {
-      if (isRoom) socket.emit("typing_start", { roomId: currentRoom, senderId: userId, senderName: username });
-      else socket.emit("typing_start", { receiverId: targetId, senderId: userId, senderName: username });
-    }
-    typingTimeout.current[key] = setTimeout(() => handleTypingStop(targetId, isRoom), 2000);
-  };
-
-  const handleTypingStop = (targetId, isRoom = false) => {
-    const key = isRoom ? `room_${currentRoom}_${userId}` : `private_${targetId}_${userId}`;
-    if (typingTimeout.current[key]) { clearTimeout(typingTimeout.current[key]); delete typingTimeout.current[key]; }
-    if (isRoom) socket.emit("typing_stop", { roomId: currentRoom, senderId: userId, senderName: username });
-    else socket.emit("typing_stop", { receiverId: targetId, senderId: userId, senderName: username });
-  };
-
-  // News Feed Enhanced Functions
-  const formatTimeAgo = (date) => {
-    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-    if (seconds < 60) return 'just now';
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `${days}d ago`;
-    return new Date(date).toLocaleDateString();
-  };
-
-  const reactToPost = async (postId, reaction) => {
-    try {
-      const response = await fetch(`http://localhost:3001/api/news/${postId}/react`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, reaction })
-      });
-      const updatedPost = await response.json();
-      setPostReactions(prev => ({ ...prev, [postId]: updatedPost.reactionCounts }));
-      setShowReactionPicker(prev => ({ ...prev, [postId]: false }));
-    } catch (error) { console.error('Error reacting:', error); }
-  };
-
-  const addComment = async (postId, parentId = null) => {
-    const content = parentId ? (newComment[`${postId}_${parentId}`] || '').trim() : (newComment[postId] || '').trim();
-    if (!content) return;
-    try {
-      const response = await fetch(`http://localhost:3001/api/news/${postId}/comment`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, username, content, parentId })
-      });
-      const comment = await response.json();
-      setPostComments(prev => ({ ...prev, [postId]: [...(prev[postId] || []), comment] }));
-      if (parentId) { setNewComment(prev => ({ ...prev, [`${postId}_${parentId}`]: '' })); setReplyingTo(prev => ({ ...prev, [postId]: null })); }
-      else setNewComment(prev => ({ ...prev, [postId]: '' }));
-    } catch (error) { console.error('Error adding comment:', error); }
-  };
-
-  const likeComment = async (postId, commentId) => {
-    try {
-      const response = await fetch(`http://localhost:3001/api/news/${postId}/comment/${commentId}/like`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId })
-      });
-      const updatedComment = await response.json();
-      setPostComments(prev => ({ ...prev, [postId]: prev[postId]?.map(c => c._id === commentId ? updatedComment : c) || [] }));
-    } catch (error) { console.error('Error liking comment:', error); }
-  };
-
-  const sharePost = async (postId) => {
-    try { await fetch(`http://localhost:3001/api/news/${postId}/share`, { method: 'POST' }); alert('Post shared! 🔗'); }
-    catch (error) { console.error('Error sharing:', error); }
-  };
-
-  const toggleComments = (postId) => { setShowComments(prev => ({ ...prev, [postId]: !prev[postId] })); if (!showComments[postId]) fetchPostComments(postId); };
-
-  const fetchPostComments = async (postId) => {
-    try {
-      const response = await fetch(`http://localhost:3001/api/news/${postId}/comments`);
-      const comments = await response.json();
-      setPostComments(prev => ({ ...prev, [postId]: comments }));
-    } catch (error) { console.error('Error fetching comments:', error); }
-  };
-
-  const getReactionsSummary = (counts) => {
-    if (!counts) return '';
-    const reactions = Object.entries(counts).filter(([_, count]) => count > 0).map(([type, count]) => {
-      const emojis = { like: '👍', love: '❤️', haha: '😂', wow: '😮', sad: '😢', angry: '😡' };
-      return `${emojis[type] || '👍'} ${count}`;
-    });
-    return reactions.join(' ');
-  };
-
-  // Ndivho AI Functions (Library Popup)
-  const sendToNdivhoAI = async () => {
-    if (!ndivhoInput.trim()) return;
-    const userMessage = ndivhoInput.trim();
-    setNdivhoMessages(prev => [...prev, { sender: 'user', text: userMessage, timestamp: new Date() }]);
-    setNdivhoInput("");
-    setIsAITyping(true);
-    try {
-      const response = await fetch('http://localhost:3001/api/ndivho-ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage })
-      });
-      const data = await response.json();
-      setTimeout(() => {
-        setNdivhoMessages(prev => [...prev, { sender: 'bot', text: data.response, timestamp: data.timestamp }]);
-        setIsAITyping(false);
-      }, 1000);
-    } catch (error) {
-      console.error('Error:', error);
-      setIsAITyping(false);
-    }
-  };
-
-  // AI ROOM Functions (Standalone Feature) - FIXED UPLOAD
-  const sendToAI = async () => {
-    if (!aiInput.trim()) return;
-    const userMessage = aiInput.trim();
-    setAiMessages(prev => [...prev, { sender: 'user', text: userMessage, timestamp: new Date() }]);
-    setAiInput("");
-    setIsAiTyping(true);
-    try {
-      const response = await fetch('http://localhost:3001/api/ndivho-ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage, userId, moduleCode: aiModuleCode })
-      });
-      const data = await response.json();
-      setTimeout(() => {
-        setAiMessages(prev => [...prev, { sender: 'bot', text: data.response, timestamp: data.timestamp }]);
-        setIsAiTyping(false);
-        console.log('✅ AI Response:', data.source, 'Guides used:', data.studyGuidesUsed);
-      }, 1000);
-    } catch (error) {
-      console.error('Error:', error);
-      setIsAiTyping(false);
-    }
-  };
-
-  const handleAiFileUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('title', file.name.split('.')[0]);
-    formData.append('moduleCode', aiModuleCode || 'GENERAL');
-    formData.append('userId', userId);
-    formData.append('uploaderName', username);
-    formData.append('uploaderRole', 'founder'); // Force founder for auto-verification
-    
-    try {
-      const response = await fetch('http://localhost:3001/api/study-guides/upload', {
-        method: 'POST',
-        body: formData
-      });
-      const result = await response.json();
-      
-      if (response.ok) {
-        alert(result.message);
-        setAiMessages(prev => [...prev, { 
-          sender: 'bot', 
-          text: `✅ ${result.message}\n\nI can now answer questions about this content!`, 
-          timestamp: new Date() 
-        }]);
-      } else {
-        alert(`❌ Upload failed: ${result.error || 'Unknown error'}`);
-      }
-      e.target.value = '';
-    } catch (error) {
-      console.error('Upload error:', error);
-      alert('❌ Upload failed. Please check if the server is running.');
-    }
-  };
-
-  // AUTH SCREEN
+  // === AUTH SCREEN ===
   if (showAuth) {
     return (
       <div className="App auth-page">
@@ -939,6 +1169,59 @@ function App() {
                 <input type="text" value={authDisplayName} onChange={(e) => setAuthDisplayName(e.target.value)} placeholder="Your name" />
               </div>
               <div className="input-group-modern">
+                <label>Email</label>
+                <input type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} placeholder="Your email" />
+              </div>
+              <div className="input-group-modern">
+                <label>Phone Number</label>
+                <input type="tel" value={authPhone} onChange={(e) => setAuthPhone(e.target.value)} placeholder="Your phone number" />
+              </div>
+              <div className="input-group-modern">
+                <label>Gender</label>
+                <select value={authGender} onChange={(e) => setAuthGender(e.target.value)}>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+              <div className="input-group-modern">
+                <label>Faculty</label>
+                <select value={authFaculty} onChange={(e) => setAuthFaculty(e.target.value)}>
+                  <option value="">Select Faculty</option>
+                  <option>Agriculture, Science & Engineering</option>
+                  <option>Commerce, Law & Management</option>
+                  <option>Humanities, Social Sciences & Education</option>
+                  <option>Health Sciences</option>
+                </select>
+              </div>
+              <div className="input-group-modern">
+                <label>Level of Study</label>
+                <select value={authLevelOfStudy} onChange={(e) => setAuthLevelOfStudy(e.target.value)}>
+                  <option>First Year</option>
+                  <option>Second Year</option>
+                  <option>Third Year</option>
+                  <option>Fourth Year</option>
+                  <option>Honours</option>
+                  <option>Masters</option>
+                  <option>PhD</option>
+                </select>
+              </div>
+              <div className="input-group-modern">
+                <label>Relationship Status</label>
+                <select value={authRelationshipStatus} onChange={(e) => setAuthRelationshipStatus(e.target.value)}>
+                  <option value="Single">Single</option>
+                  <option value="In Relationship">In Relationship</option>
+                  <option value="It's Complicated">It's Complicated</option>
+                </select>
+              </div>
+              {authRelationshipStatus === 'Single' && (
+                <div className="input-group-modern checkbox-group">
+                  <label>
+                    <input type="checkbox" checked={authJoinMingle} onChange={(e) => setAuthJoinMingle(e.target.checked)} />
+                    Join Single & Mingle automatically
+                  </label>
+                </div>
+              )}
+              <div className="input-group-modern">
                 <label>Password</label>
                 <input type="password" value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} placeholder="Create password" />
               </div>
@@ -951,7 +1234,7 @@ function App() {
     );
   }
 
-  // MAIN APP
+  // === MAIN APP ===
   return (
     <div className="App">
       <div className="app-container">
@@ -966,7 +1249,9 @@ function App() {
           <div className="nav-tabs-sidebar">
             <button className={`nav-tab ${activeTab === 'rooms' ? 'active' : ''}`} onClick={() => setActiveTab('rooms')}>🏛️ Rooms</button>
             <button className={`nav-tab ${aiRoomActive ? 'active' : ''}`} onClick={() => { setAiRoomActive(true); setActiveTab(''); }}>🤖 Ndivho AI</button>
-            <button className={`nav-tab ${activeTab === 'connections' ? 'active' : ''}`} onClick={() => setActiveTab('connections')}>💕 Connections {matches.length > 0 && <span className="notification-badge">{matches.length}</span>}</button>
+            <button className={`nav-tab ${activeTab === 'connections' ? 'active' : ''}`} onClick={() => setActiveTab('connections')}>
+              💕 Single & Mingle {matches.length > 0 && <span className="notification-badge">{matches.length}</span>}
+            </button>
             <button className={`nav-tab ${activeTab === 'friends' ? 'active' : ''}`} onClick={() => setActiveTab('friends')}>👥 Friends ({friends.length})</button>
             <button className={`nav-tab ${activeTab === 'requests' ? 'active' : ''}`} onClick={() => setActiveTab('requests')}>📨 Requests ({friendRequests.length})</button>
             <button className={`nav-tab ${activeTab === 'news' ? 'active' : ''}`} onClick={() => setActiveTab('news')}>📰 News Feed</button>
@@ -987,6 +1272,44 @@ function App() {
           )}
           {activeTab === 'friends' && (
             <div className="friends-list">
+              {/* Modern Search Bar */}
+              <div className="search-section">
+                <div className="search-box-modern">
+                  <input
+                    type="text"
+                    placeholder="Search users by username..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      if (e.target.value.trim()) {
+                        searchUsers();
+                      } else {
+                        setShowSearchResults(false);
+                      }
+                    }}
+                    className="search-input-modern"
+                  />
+                  <button onClick={searchUsers} className="search-button">🔍</button>
+                </div>
+                {showSearchResults && searchResults.length > 0 && (
+                  <div className="search-results-modern">
+                    {searchResults.map(user => (
+                      <div key={user._id} className="search-result-item">
+                        <div className="result-avatar">
+                          {user.avatar ? <img src={user.avatar} alt="" /> : <span>👤</span>}
+                        </div>
+                        <div className="result-info">
+                          <h4>{user.displayName || user.username}</h4>
+                          <p>@{user.username}</p>
+                        </div>
+                        <button className="btn-add-friend" onClick={() => sendFriendRequest(user._id)}>+ Add</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Friends List */}
               {friends.map(friend => (
                 <div key={friend._id} className={`friend-item ${selectedFriend?._id === friend._id ? 'active' : ''}`} onClick={() => selectFriend(friend)}>
                   <div className="friend-avatar">
@@ -999,18 +1322,6 @@ function App() {
                   </div>
                 </div>
               ))}
-              <div className="add-friends-section">
-                <h3>Add Friends</h3>
-                {allUsers.filter(u => !friends.find(f => f._id === u._id)).map(user => (
-                  <div key={user._id} className="user-to-add">
-                    <div className="user-info-small">
-                      <span>{user.displayName || user.username}</span>
-                      <small>{user.username}</small>
-                    </div>
-                    <button className="btn-add-friend" onClick={() => sendFriendRequest(user._id)}>+ Add</button>
-                  </div>
-                ))}
-              </div>
             </div>
           )}
           {activeTab === 'requests' && (
@@ -1038,7 +1349,7 @@ function App() {
               </button>
               {showNewsForm && (
                 <div className="form-container">
-                  <textarea placeholder="What's happening?" value={newsPost.content} onChange={(e) => setNewsPost({...newsPost, content: e.target.value})} />
+                  <textarea placeholder="What's happening?" value={newsPost.content} onChange={(e) => setNewsPost({ ...newsPost, content: e.target.value })} />
                   <input type="file" accept="image/*" multiple onChange={async (e) => {
                     const files = Array.from(e.target.files);
                     const imagePromises = files.map(file => {
@@ -1052,7 +1363,7 @@ function App() {
                     setNewsImages(images);
                   }} />
                   {newsImages.length > 0 && <p className="image-preview-count">{newsImages.length} image(s) selected</p>}
-                  <input type="text" placeholder="Tags (comma separated)" value={newsPost.tags} onChange={(e) => setNewsPost({...newsPost, tags: e.target.value})} />
+                  <input type="text" placeholder="Tags (comma separated)" value={newsPost.tags} onChange={(e) => setNewsPost({ ...newsPost, tags: e.target.value })} />
                   <button className="btn-primary" onClick={createNewsPost}>Publish</button>
                 </div>
               )}
@@ -1065,41 +1376,41 @@ function App() {
               </div>
               <div className="user-details">
                 <h4>{editProfile.displayName || username}</h4>
-                {currentUser?.role === 'founder' && <p className="user-status" style={{color: '#feca57'}}>👑 Founder</p>}
+                {currentUser?.role === 'founder' && <p className="user-status" style={{ color: '#feca57' }}>👑 Founder</p>}
                 {currentUser?.role !== 'founder' && <p className="user-status">● Online</p>}
               </div>
             </div>
-            <button className="logout-btn" onClick={() => setShowAuth(true)}>Logout</button>
+            <button className="logout-btn" onClick={handleLogout}>Logout</button>
           </div>
         </div>
 
         {/* Main Content */}
         <div className="main-chat-area">
-          {/* AI ROOM - STANDALONE FEATURE */}
+          {/* AI ROOM */}
           {aiRoomActive && (
             <div className="ai-room-full">
               <div className="ai-room-header-full">
                 <div className="ai-header-left">
-                 <div className="ai-avatar-large">
-  <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%'}} />
-</div>
+                  <div className="ai-avatar-large">
+                    <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                  </div>
                   <div className="ai-title-section">
                     <h2>Ndivho AI</h2>
                     <p>Your UNIVEN Study Assistant - Powered by Llama 3</p>
                   </div>
                 </div>
                 <div className="ai-header-right">
-                  <input 
-                    type="text" 
-                    placeholder="Module Code (optional)" 
+                  <input
+                    type="text"
+                    placeholder="Module Code (optional)"
                     value={aiModuleCode}
                     onChange={(e) => setAiModuleCode(e.target.value.toUpperCase())}
                     className="ai-module-code-input"
                   />
                   <label className="ai-upload-button-header">
-                    <input 
-                      type="file" 
-                      accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp,.bmp" 
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp,.bmp"
                       onChange={handleAiFileUpload}
                       style={{ display: 'none' }}
                     />
@@ -1108,22 +1419,21 @@ function App() {
                   <button className="close-ai-room-btn" onClick={() => setAiRoomActive(false)}>×</button>
                 </div>
               </div>
-              
               <div className="ai-chat-container">
                 <div className="ai-messages-area">
                   {aiMessages.map((msg, i) => (
                     <div key={i} className={`ai-chat-message ${msg.sender}`}>
-                     <div className="ai-chat-avatar">
-  {msg.sender === 'bot' ? (
-    <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%'}} />
-  ) : (
-    '👤'
-  )}
-</div>
+                      <div className="ai-chat-avatar">
+                        {msg.sender === 'bot' ? (
+                          <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                        ) : (
+                          '👤'
+                        )}
+                      </div>
                       <div className="ai-chat-bubble">
                         <p>{msg.text}</p>
                         <span className="ai-chat-time">
-                          {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
                     </div>
@@ -1139,10 +1449,9 @@ function App() {
                     </div>
                   )}
                 </div>
-                
                 <div className="ai-input-container">
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={aiInput}
                     onChange={(e) => setAiInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && sendToAI()}
@@ -1155,34 +1464,90 @@ function App() {
             </div>
           )}
 
-          {/* Other content sections - keeping existing code for Connections, News, Library, etc. */}
+          {/* Single & Mingle with Statuses */}
           {activeTab === 'connections' && (
             <div className="connections-container">
               <div className="connections-header">
-                <h2>💕 Campus Connections</h2>
-                <button className="btn-primary" onClick={() => setShowProfileForm(!showProfileForm)}>
-                  {showProfileForm ? 'Cancel' : 'Create My Profile'}
-                </button>
+                <h2>💕 Single & Mingle</h2>
+                <div className="connections-actions">
+                  <button className="btn-secondary" onClick={() => setShowStatusForm(!showStatusForm)}>
+                    {showStatusForm ? 'Cancel' : '📸 Post Status'}
+                  </button>
+                  <button className="btn-primary" onClick={() => setShowProfileForm(!showProfileForm)}>
+                    {showProfileForm ? 'Cancel' : 'Create Profile'}
+                  </button>
+                </div>
               </div>
+
+              {/* Status Post Form */}
+              {showStatusForm && (
+                <div className="status-form-container">
+                  <h3>Post Your Status</h3>
+                  <textarea
+                    placeholder="What's on your mind?"
+                    value={statusText}
+                    onChange={(e) => setStatusText(e.target.value)}
+                    maxLength={200}
+                  />
+                  <div className="status-char-count">{statusText.length}/200</div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setStatusImage(e.target.files[0])}
+                  />
+                  {statusImage && <div className="image-preview">📷 {statusImage.name}</div>}
+                  <button className="btn-primary" onClick={createMingleStatus}>Post Status</button>
+                </div>
+              )}
+
+              {/* Statuses Feed */}
+              {mingleStatuses.length > 0 && (
+                <div className="statuses-feed">
+                  <h3>📱 Recent Statuses</h3>
+                  {mingleStatuses.map(status => (
+                    <div key={status._id} className="status-card">
+                      <div className="status-header">
+                        <div className="status-avatar">
+                          {status.user?.avatar ? <img src={status.user.avatar} alt="" /> : <span>👤</span>}
+                        </div>
+                        <div className="status-info">
+                          <h4>{status.user?.displayName || status.username}</h4>
+                          <p>{formatTimeAgo(status.createdAt)}</p>
+                        </div>
+                      </div>
+                      {status.text && <p className="status-text">{status.text}</p>}
+                      {status.image && <img src={status.image} alt="status" className="status-image" />}
+                      <div className="status-actions">
+                        <button className="status-action-btn">❤️ Like</button>
+                        <button className="status-action-btn">💬 Comment</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Profile Form */}
               {showProfileForm && (
                 <div className="form-container">
                   <h3>Create Your Connection Profile</h3>
-                  <input type="number" placeholder="Age" value={userProfile.age} onChange={(e) => setUserProfile({...userProfile, age: e.target.value})} />
-                  <input type="text" placeholder="Faculty" value={userProfile.faculty} onChange={(e) => setUserProfile({...userProfile, faculty: e.target.value})} />
-                  <textarea placeholder="Bio (keep it fun!)" value={userProfile.bio} onChange={(e) => setUserProfile({...userProfile, bio: e.target.value})} />
-                  <select value={userProfile.lookingFor} onChange={(e) => setUserProfile({...userProfile, lookingFor: e.target.value})}>
+                  <input type="number" placeholder="Age" value={userProfile.age} onChange={(e) => setUserProfile({ ...userProfile, age: e.target.value })} />
+                  <input type="text" placeholder="Faculty" value={userProfile.faculty} onChange={(e) => setUserProfile({ ...userProfile, faculty: e.target.value })} />
+                  <textarea placeholder="Bio (keep it fun!)" value={userProfile.bio} onChange={(e) => setUserProfile({ ...userProfile, bio: e.target.value })} />
+                  <select value={userProfile.lookingFor} onChange={(e) => setUserProfile({ ...userProfile, lookingFor: e.target.value })}>
                     <option value="Friends">Friends</option>
                     <option value="Study Buddy">Study Buddy</option>
                     <option value="Partner">Looking for a Partner</option>
                     <option value="Business Collab">Business Collab</option>
                   </select>
-                  <input type="text" placeholder="Interests (comma separated)" value={userProfile.interests.join(', ')} onChange={(e) => setUserProfile({...userProfile, interests: e.target.value.split(',').map(i => i.trim())})} />
-                  <input type="text" placeholder="Music (comma separated)" value={userProfile.music.join(', ')} onChange={(e) => setUserProfile({...userProfile, music: e.target.value.split(',').map(m => m.trim())})} />
-                  <input type="text" placeholder="Campus Hotspots (e.g., Block 6, Library)" value={userProfile.campusHotspots.join(', ')} onChange={(e) => setUserProfile({...userProfile, campusHotspots: e.target.value.split(',').map(h => h.trim())})} />
+                  <input type="text" placeholder="Interests (comma separated)" value={userProfile.interests.join(', ')} onChange={(e) => setUserProfile({ ...userProfile, interests: e.target.value.split(',').map(i => i.trim()) })} />
+                  <input type="text" placeholder="Music (comma separated)" value={userProfile.music.join(', ')} onChange={(e) => setUserProfile({ ...userProfile, music: e.target.value.split(',').map(m => m.trim()) })} />
+                  <input type="text" placeholder="Campus Hotspots (e.g., Block 6, Library)" value={userProfile.campusHotspots.join(', ')} onChange={(e) => setUserProfile({ ...userProfile, campusHotspots: e.target.value.split(',').map(h => h.trim()) })} />
                   <button className="btn-primary" onClick={createConnectionProfile}>Save Profile</button>
                 </div>
               )}
-              {!showProfileForm && connectionProfiles.length > 0 && currentProfileIndex < connectionProfiles.length ? (
+
+              {/* Connection Cards */}
+              {!showProfileForm && !showStatusForm && connectionProfiles.length > 0 && currentProfileIndex < connectionProfiles.length ? (
                 <div className="card-stack">
                   {connectionProfiles.slice(currentProfileIndex, currentProfileIndex + 1).map(profile => (
                     <div key={profile._id} className="connection-card" onClick={() => calculateCompatibility(profile.user)}>
@@ -1206,7 +1571,7 @@ function App() {
                           <div className="vibe-meter">
                             <div className="vibe-label">{compatibility.score}% Match</div>
                             <div className="vibe-progress">
-                              <div className="vibe-fill" style={{width: `${compatibility.score}%`}}></div>
+                              <div className="vibe-fill" style={{ width: `${compatibility.score}%` }}></div>
                             </div>
                             <p className="vibe-reason">
                               {compatibility.common.interests?.length > 0 && `Both love ${compatibility.common.interests.slice(0, 2).join(', ')}`}
@@ -1240,6 +1605,8 @@ function App() {
                   <p>Check back later for new connections</p>
                 </div>
               )}
+
+              {/* Matches */}
               {matches.length > 0 && (
                 <div className="matches-section">
                   <h3>💕 Your Matches ({matches.length})</h3>
@@ -1262,6 +1629,54 @@ function App() {
             </div>
           )}
 
+          {/* Friends Chat */}
+          {activeTab === 'friends' && (
+            selectedFriend ? (
+              <>
+                <div className="chat-header-main">
+                  <div className="chat-user-info">
+                    <h3>{selectedFriend.displayName || selectedFriend.username}</h3>
+                    <p>{selectedFriend.status === 'online' ? '● Online' : '○ Offline'}</p>
+                  </div>
+                  <div className="chat-actions">
+                    <button className="icon-btn" onClick={() => blockUser(selectedFriend._id)}>🚫 Block</button>
+                  </div>
+                </div>
+                <div className="messages-container">
+                  {privateMessages.length === 0 ? (
+                    <div className="no-messages"><p>No messages yet. Say hi! 👋</p></div>
+                  ) : (
+                    privateMessages.map((msg, index) => (
+                      <div key={index} className={`message-bubble ${msg.sender._id === userId ? 'own' : 'other'}`}>
+                        <div className="message-text">{msg.content}</div>
+                        <div className="message-meta">
+                          <span className="message-time">{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                          {msg.sender._id === userId && <span className="read-status">{msg.read ? '✓✓' : '✓'}</span>}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  {Object.keys(typingUsers).length > 0 && selectedFriend && typingUsers[selectedFriend._id] && (
+                    <div className="typing-indicator">
+                      <span className="typing-dots"><span></span><span></span><span></span></span>
+                      <span>{typingUsers[selectedFriend._id]} is typing...</span>
+                    </div>
+                  )}
+                </div>
+                <div className="message-input-area">
+                  <input type="text" value={privateMessageInput} onChange={(e) => { setPrivateMessageInput(e.target.value); handleTypingStart(selectedFriend._id, false); }} onKeyPress={(e) => { if (e.key === 'Enter') { sendPrivateMessage(); handleTypingStop(selectedFriend._id, false); } }} onBlur={() => handleTypingStop(selectedFriend._id, false)} placeholder="Type a message..." />
+                  <button className="send-button" onClick={sendPrivateMessage}>Send</button>
+                </div>
+              </>
+            ) : (
+              <div className="no-chat-selected">
+                <h2>Select a friend to start chatting</h2>
+                <p>Or search for new friends using the search bar</p>
+              </div>
+            )
+          )}
+
+          {/* News Feed */}
           {activeTab === 'news' && (
             <div className="news-feed-container">
               <div className="news-feed-header">
@@ -1281,7 +1696,7 @@ function App() {
                       <p>Share your thoughts with the campus...</p>
                     </div>
                   </div>
-                  <textarea className="post-input" placeholder="What's on your mind?" value={newsPost.content} maxLength={500} onChange={(e) => setNewsPost({...newsPost, content: e.target.value})} />
+                  <textarea className="post-input" placeholder="What's on your mind?" value={newsPost.content} maxLength={500} onChange={(e) => setNewsPost({ ...newsPost, content: e.target.value })} />
                   <div className="post-input-footer">
                     <div className="char-counter">{newsPost.content.length}/500</div>
                     <div className="post-actions">
@@ -1403,492 +1818,242 @@ function App() {
             </div>
           )}
 
-          {/* Library, Lost & Found, Marketplace, Exam Prep, Cafeteria, Friends sections */}
-         {/* Lost & Found Room */}
-{activeTab === 'rooms' && currentRoom === 'lost-found' && (
-  <div className="lost-found-container">
-    <div className="room-content-header">
-      <h2>🔍 Lost & Found</h2>
-      <div className="header-actions">
-        <button className={`view-toggle ${lostFoundView === 'list' ? 'active' : ''}`} onClick={() => setLostFoundView('list')}>📋 List</button>
-        <button className={`view-toggle ${lostFoundView === 'gallery' ? 'active' : ''}`} onClick={() => setLostFoundView('gallery')}>🖼️ Gallery</button>
-        <button className="btn-primary" onClick={() => setShowLostFoundForm(!showLostFoundForm)}>{showLostFoundForm ? 'Cancel' : '+ I Found This'}</button>
-      </div>
-    </div>
-    {showLostFoundForm && (
-      <div className="form-container">
-        <h3>Post Lost/Found Item</h3>
-        <select value={lostFoundItem.type} onChange={(e) => setLostFoundItem({...lostFoundItem, type: e.target.value})}>
-          <option value="Found">I Found Something</option>
-          <option value="Lost">I Lost Something</option>
-        </select>
-        <input type="text" placeholder="Item Title" value={lostFoundItem.title} onChange={(e) => setLostFoundItem({...lostFoundItem, title: e.target.value})} />
-        <textarea placeholder="Description" value={lostFoundItem.description} onChange={(e) => setLostFoundItem({...lostFoundItem, description: e.target.value})} />
-        <input type="text" placeholder="Location" value={lostFoundItem.location} onChange={(e) => setLostFoundItem({...lostFoundItem, location: e.target.value})} />
-        <input type="date" value={lostFoundItem.date} onChange={(e) => setLostFoundItem({...lostFoundItem, date: e.target.value})} />
-        <input type="text" placeholder="Contact Info" value={lostFoundItem.contactInfo} onChange={(e) => setLostFoundItem({...lostFoundItem, contactInfo: e.target.value})} />
-        <input type="file" accept="image/*" multiple onChange={async (e) => {
-          const files = Array.from(e.target.files);
-          const imagePromises = files.map(file => {
-            return new Promise((resolve) => {
-              const reader = new FileReader();
-              reader.onload = () => resolve(reader.result);
-              reader.readAsDataURL(file);
-            });
-          });
-          const images = await Promise.all(imagePromises);
-          setLfImages(images);
-        }} />
-        {lfImages.length > 0 && <div className="image-preview">{lfImages.length} photo(s) selected</div>}
-        <button className="btn-primary" onClick={createLostFoundItem}>Post</button>
-      </div>
-    )}
-    {lostFoundView === 'gallery' ? (
-      <div className="lost-found-gallery">
-        {lostFoundItems.map(item => (
-          <div key={item._id} className={`lf-gallery-card ${item.status}`}>
-            <div className="lf-gallery-image">
-              {item.images && item.images.length > 0 ? <img src={item.images[0]} alt={item.title} /> : <span>📦</span>}
-              <span className={`status-badge ${item.status}`}>{item.status}</span>
-            </div>
-            <div className="lf-gallery-info">
-              <h4>{item.title}</h4>
-              <p>{item.location}</p>
-              {item.status === 'FOUND' && item.type === 'Found' && (
-                <button className="btn-claim" onClick={() => { setItemToClaim(item._id); setShowClaimModal(true); }}>🙋 Claim</button>
+          {/* Lost & Found Room */}
+          {activeTab === 'rooms' && currentRoom === 'lost-found' && (
+            <div className="lost-found-container">
+              <div className="room-content-header">
+                <h2>🔍 Lost & Found</h2>
+                <div className="header-actions">
+                  <button className={`view-toggle ${lostFoundView === 'list' ? 'active' : ''}`} onClick={() => setLostFoundView('list')}>📋 List</button>
+                  <button className={`view-toggle ${lostFoundView === 'gallery' ? 'active' : ''}`} onClick={() => setLostFoundView('gallery')}>🖼️ Gallery</button>
+                  <button className="btn-primary" onClick={() => setShowLostFoundForm(!showLostFoundForm)}>{showLostFoundForm ? 'Cancel' : '+ I Found This'}</button>
+                </div>
+              </div>
+              {showLostFoundForm && (
+                <div className="form-container">
+                  <h3>Post Lost/Found Item</h3>
+                  <select value={lostFoundItem.type} onChange={(e) => setLostFoundItem({ ...lostFoundItem, type: e.target.value })}>
+                    <option value="Found">I Found Something</option>
+                    <option value="Lost">I Lost Something</option>
+                  </select>
+                  <input type="text" placeholder="Item Title" value={lostFoundItem.title} onChange={(e) => setLostFoundItem({ ...lostFoundItem, title: e.target.value })} />
+                  <textarea placeholder="Description" value={lostFoundItem.description} onChange={(e) => setLostFoundItem({ ...lostFoundItem, description: e.target.value })} />
+                  <input type="text" placeholder="Location" value={lostFoundItem.location} onChange={(e) => setLostFoundItem({ ...lostFoundItem, location: e.target.value })} />
+                  <input type="date" value={lostFoundItem.date} onChange={(e) => setLostFoundItem({ ...lostFoundItem, date: e.target.value })} />
+                  <input type="text" placeholder="Contact Info" value={lostFoundItem.contactInfo} onChange={(e) => setLostFoundItem({ ...lostFoundItem, contactInfo: e.target.value })} />
+                  <input type="file" accept="image/*" multiple onChange={async (e) => {
+                    const files = Array.from(e.target.files);
+                    const imagePromises = files.map(file => {
+                      return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(file);
+                      });
+                    });
+                    const images = await Promise.all(imagePromises);
+                    setLfImages(images);
+                  }} />
+                  {lfImages.length > 0 && <div className="image-preview">{lfImages.length} photo(s) selected</div>}
+                  <button className="btn-primary" onClick={createLostFoundItem}>Post</button>
+                </div>
+              )}
+              {lostFoundView === 'gallery' ? (
+                <div className="lost-found-gallery">
+                  {lostFoundItems.map(item => (
+                    <div key={item._id} className={`lf-gallery-card ${item.status}`}>
+                      <div className="lf-gallery-image">
+                        {item.images && item.images.length > 0 ? <img src={item.images[0]} alt={item.title} /> : <span>📦</span>}
+                        <span className={`status-badge ${item.status}`}>{item.status}</span>
+                      </div>
+                      <div className="lf-gallery-info">
+                        <h4>{item.title}</h4>
+                        <p>{item.location}</p>
+                        {item.status === 'FOUND' && item.type === 'Found' && (
+                          <button className="btn-claim" onClick={() => { setItemToClaim(item._id); setShowClaimModal(true); }}>🙋 Claim</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="lost-found-list">
+                  {lostFoundItems.map(item => (
+                    <div key={item._id} className={`lost-found-card ${item.type} ${item.status.toLowerCase()}`}>
+                      <div className="lf-header">
+                        <span className={`lf-badge ${item.type}`}>{item.type}</span>
+                        <span className={`status-badge ${item.status}`}>{item.status}</span>
+                        <h4>{item.title}</h4>
+                      </div>
+                      <p>{item.description}</p>
+                      <p>📍 {item.location} • 📅 {new Date(item.date).toLocaleDateString()}</p>
+                      <p>👤 {item.username}</p>
+                      <p>📞 {item.contactInfo}</p>
+                      {item.images && item.images.length > 0 && (
+                        <div className="lf-images">
+                          {item.images.map((img, i) => <img key={i} src={img} alt="item" />)}
+                        </div>
+                      )}
+                      {item.status === 'FOUND' && item.type === 'Found' && (
+                        <button className="btn-claim" onClick={() => { setItemToClaim(item._id); setShowClaimModal(true); }}>🙋 Claim This Item</button>
+                      )}
+                      {item.status === 'CLAIMED' && userId === item.user.toString() && (
+                        <button className="btn-return" onClick={() => returnItem(item._id)}>✓ Mark as Returned</button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
-          </div>
-        ))}
-      </div>
-    ) : (
-      <div className="lost-found-list">
-        {lostFoundItems.map(item => (
-          <div key={item._id} className={`lost-found-card ${item.type} ${item.status.toLowerCase()}`}>
-            <div className="lf-header">
-              <span className={`lf-badge ${item.type}`}>{item.type}</span>
-              <span className={`status-badge ${item.status}`}>{item.status}</span>
-              <h4>{item.title}</h4>
-            </div>
-            <p>{item.description}</p>
-            <p>📍 {item.location} • 📅 {new Date(item.date).toLocaleDateString()}</p>
-            <p>👤 {item.username}</p>
-            <p>📞 {item.contactInfo}</p>
-            {item.images && item.images.length > 0 && (
-              <div className="lf-images">
-                {item.images.map((img, i) => <img key={i} src={img} alt="item" />)}
+          )}
+
+          {/* Marketplace Room */}
+          {activeTab === 'rooms' && currentRoom === 'marketplace' && (
+            <div className="marketplace-container">
+              <div className="room-content-header">
+                <h2>💼 Campus Marketplace</h2>
+                <div className="header-actions">
+                  <input type="text" placeholder="Search items..." value={marketSearch} onChange={(e) => setMarketSearch(e.target.value)} className="search-input" />
+                  <select value={marketFilter} onChange={(e) => setMarketFilter(e.target.value)} className="filter-select">
+                    <option value="All">All Categories</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Textbooks">Textbooks</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Furniture">Furniture</option>
+                    <option value="Services">Services</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <button className="btn-primary" onClick={() => setShowMarketForm(!showMarketForm)}>{showMarketForm ? 'Cancel' : '+ Sell Item'}</button>
+                </div>
               </div>
-            )}
-            {item.status === 'FOUND' && item.type === 'Found' && (
-              <button className="btn-claim" onClick={() => { setItemToClaim(item._id); setShowClaimModal(true); }}>🙋 Claim This Item</button>
-            )}
-            {item.status === 'CLAIMED' && userId === item.user.toString() && (
-              <button className="btn-return" onClick={() => returnItem(item._id)}>✓ Mark as Returned</button>
-            )}
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-)}
-
-{/* Marketplace Room */}
-{activeTab === 'rooms' && currentRoom === 'marketplace' && (
-  <div className="marketplace-container">
-    <div className="room-content-header">
-      <h2>💼 Campus Marketplace</h2>
-      <div className="header-actions">
-        <input type="text" placeholder="Search items..." value={marketSearch} onChange={(e) => setMarketSearch(e.target.value)} className="search-input" />
-        <select value={marketFilter} onChange={(e) => setMarketFilter(e.target.value)} className="filter-select">
-          <option value="All">All Categories</option>
-          <option value="Electronics">Electronics</option>
-          <option value="Textbooks">Textbooks</option>
-          <option value="Clothing">Clothing</option>
-          <option value="Furniture">Furniture</option>
-          <option value="Services">Services</option>
-          <option value="Other">Other</option>
-        </select>
-        <button className="btn-primary" onClick={() => setShowMarketForm(!showMarketForm)}>{showMarketForm ? 'Cancel' : '+ Sell Item'}</button>
-      </div>
-    </div>
-    {showMarketForm && (
-      <div className="form-container">
-        <h3>List an Item for Sale</h3>
-        <input type="text" placeholder="Item Title" value={marketItem.title} onChange={(e) => setMarketItem({...marketItem, title: e.target.value})} />
-        <textarea placeholder="Description" value={marketItem.description} onChange={(e) => setMarketItem({...marketItem, description: e.target.value})} />
-        <input type="number" placeholder="Price (R)" value={marketItem.price} onChange={(e) => setMarketItem({...marketItem, price: e.target.value})} />
-        <select value={marketItem.category} onChange={(e) => setMarketItem({...marketItem, category: e.target.value})}>
-          <option>Electronics</option>
-          <option>Textbooks</option>
-          <option>Clothing</option>
-          <option>Furniture</option>
-          <option>Services</option>
-          <option>Other</option>
-        </select>
-        <select value={marketItem.condition} onChange={(e) => setMarketItem({...marketItem, condition: e.target.value})}>
-          <option>New</option>
-          <option>Like New</option>
-          <option>Good</option>
-          <option>Fair</option>
-          <option>Poor</option>
-        </select>
-        <input type="text" placeholder="Contact Info" value={marketItem.contactInfo} onChange={(e) => setMarketItem({...marketItem, contactInfo: e.target.value})} />
-        <input type="file" accept="image/*" multiple onChange={async (e) => {
-          const files = Array.from(e.target.files);
-          const imagePromises = files.map(file => {
-            return new Promise((resolve) => {
-              const reader = new FileReader();
-              reader.onload = () => resolve(reader.result);
-              reader.readAsDataURL(file);
-            });
-          });
-          const images = await Promise.all(imagePromises);
-          setMarketImages(images);
-        }} />
-        {marketImages.length > 0 && <div className="image-preview">{marketImages.length} photo(s) selected</div>}
-        <button className="btn-primary" onClick={createMarketItem}>List Item</button>
-      </div>
-    )}
-    <div className="marketplace-grid">
-      {marketplaceItems.map(item => (
-        <div key={item._id} className="market-item-card">
-          <div className="item-image-carousel">
-            {item.images && item.images.length > 0 ? (
-              <>
-                <img src={item.images[currentImageIndex[item._id] || 0]} alt={item.title} />
-                {item.images.length > 1 && (
-                  <div className="carousel-controls">
-                    <button onClick={() => prevImage(item._id, item.images.length)}>◀</button>
-                    <span>{(currentImageIndex[item._id] || 0) + 1}/{item.images.length}</span>
-                    <button onClick={() => nextImage(item._id, item.images.length)}>▶</button>
-                  </div>
-                )}
-              </>
-            ) : <span>📦</span>}
-          </div>
-          <div className="item-details">
-            <h4>{item.title}</h4>
-            <p className="item-price">R {item.price}</p>
-            <p className="item-category">{item.category} • {item.condition}</p>
-            <p className="item-seller">Seller: {item.sellerName}</p>
-            <p className="item-contact">📞 {item.contactInfo}</p>
-            <div className="item-actions">
-              <button className="btn-interested" onClick={() => markInterested(item._id)}>💬 Interested</button>
-              <span className={`item-status ${item.status}`}>{item.status}</span>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-
-{/* Exam Prep Room */}
-{activeTab === 'rooms' && currentRoom === 'exam-prep' && (
-  <div className="exam-prep-container">
-    <div className="room-content-header">
-      <h2>📝 Exam Prep War Room</h2>
-      <button className="btn-primary" onClick={() => setShowThreadForm(!showThreadForm)}>{showThreadForm ? 'Cancel' : '+ New Thread'}</button>
-    </div>
-    {showThreadForm && (
-      <div className="form-container">
-        <h3>Create Study Thread</h3>
-        <input type="text" placeholder="Thread Title" value={examThread.title} onChange={(e) => setExamThread({...examThread, title: e.target.value})} />
-        <textarea placeholder="Your Question" value={examThread.question} onChange={(e) => setExamThread({...examThread, question: e.target.value})} />
-        <input type="file" accept="image/*" onChange={(e) => {
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = () => setThreadImage(reader.result);
-            reader.readAsDataURL(file);
-          }
-        }} />
-        {threadImage && <div className="image-preview">Image attached</div>}
-        <button className="btn-primary" onClick={createExamThread}>Create Thread</button>
-      </div>
-    )}
-    <div className="exam-threads">
-      {examThreads.map(thread => (
-        <div key={thread._id} className="thread-card">
-          <div className="thread-header" onClick={() => setActiveThreadId(activeThreadId === thread._id ? null : thread._id)}>
-            <h4>{thread.title}</h4>
-            <p>by {thread.authorName} • {thread.replies.length} replies</p>
-          </div>
-          {activeThreadId === thread._id && (
-            <div className="thread-content">
-              <p className="thread-question">{thread.question}</p>
-              {thread.image && <img src={thread.image} alt="question" className="thread-image" />}
-              <div className="thread-replies">
-                {thread.replies.map((reply, i) => (
-                  <div key={i} className="reply">
-                    <strong>{reply.authorName}</strong>
-                    <p>{reply.content}</p>
-                    {reply.image && <img src={reply.image} alt="reply" className="reply-image" />}
+              {showMarketForm && (
+                <div className="form-container">
+                  <h3>List an Item for Sale</h3>
+                  <input type="text" placeholder="Item Title" value={marketItem.title} onChange={(e) => setMarketItem({ ...marketItem, title: e.target.value })} />
+                  <textarea placeholder="Description" value={marketItem.description} onChange={(e) => setMarketItem({ ...marketItem, description: e.target.value })} />
+                  <input type="number" placeholder="Price (R)" value={marketItem.price} onChange={(e) => setMarketItem({ ...marketItem, price: e.target.value })} />
+                  <select value={marketItem.category} onChange={(e) => setMarketItem({ ...marketItem, category: e.target.value })}>
+                    <option>Electronics</option>
+                    <option>Textbooks</option>
+                    <option>Clothing</option>
+                    <option>Furniture</option>
+                    <option>Services</option>
+                    <option>Other</option>
+                  </select>
+                  <select value={marketItem.condition} onChange={(e) => setMarketItem({ ...marketItem, condition: e.target.value })}>
+                    <option>New</option>
+                    <option>Like New</option>
+                    <option>Good</option>
+                    <option>Fair</option>
+                    <option>Poor</option>
+                  </select>
+                  <input type="text" placeholder="Contact Info" value={marketItem.contactInfo} onChange={(e) => setMarketItem({ ...marketItem, contactInfo: e.target.value })} />
+                  <input type="file" accept="image/*" multiple onChange={async (e) => {
+                    const files = Array.from(e.target.files);
+                    const imagePromises = files.map(file => {
+                      return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(file);
+                      });
+                    });
+                    const images = await Promise.all(imagePromises);
+                    setMarketImages(images);
+                  }} />
+                  {marketImages.length > 0 && <div className="image-preview">{marketImages.length} photo(s) selected</div>}
+                  <button className="btn-primary" onClick={createMarketItem}>List Item</button>
+                </div>
+              )}
+              <div className="marketplace-grid">
+                {marketplaceItems.map(item => (
+                  <div key={item._id} className="market-item-card">
+                    <div className="item-image-carousel">
+                      {item.images && item.images.length > 0 ? (
+                        <>
+                          <img src={item.images[currentImageIndex[item._id] || 0]} alt={item.title} />
+                          {item.images.length > 1 && (
+                            <div className="carousel-controls">
+                              <button onClick={() => prevImage(item._id, item.images.length)}>◀</button>
+                              <span>{(currentImageIndex[item._id] || 0) + 1}/{item.images.length}</span>
+                              <button onClick={() => nextImage(item._id, item.images.length)}>▶</button>
+                            </div>
+                          )}
+                        </>
+                      ) : <span>📦</span>}
+                    </div>
+                    <div className="item-details">
+                      <h4>{item.title}</h4>
+                      <p className="item-price">R {item.price}</p>
+                      <p className="item-category">{item.category} • {item.condition}</p>
+                      <p className="item-seller">Seller: {item.sellerName}</p>
+                      <p className="item-contact">📞 {item.contactInfo}</p>
+                      <div className="item-actions">
+                        <button className="btn-interested" onClick={() => markInterested(item._id)}>💬 Interested</button>
+                        <span className={`item-status ${item.status}`}>{item.status}</span>
+                      </div>
+                    </div>
                   </div>
                 ))}
-              </div>
-              <div className="reply-form">
-                <input type="text" placeholder="Your reply..." value={threadReply} onChange={(e) => setThreadReply(e.target.value)} />
-                <button onClick={() => replyToThread(thread._id)}>Reply</button>
               </div>
             </div>
           )}
-        </div>
-      ))}
-    </div>
-  </div>
-)}
 
-{/* Cafeteria Room */}
-{activeTab === 'rooms' && currentRoom === 'cafeteria' && (
-  <>
-    <div className="chat-header-main">
-      <div className="chat-user-info">
-        <h3>{rooms.find(r => r.id === currentRoom)?.name || 'Chat Room'}</h3>
-        <p>{rooms.find(r => r.id === currentRoom)?.description || ''}</p>
-      </div>
-    </div>
-    <div className="messages-container">
-      {roomMessages.length === 0 ? (
-        <div className="no-messages"><p>No messages yet. Start the conversation! 💬</p></div>
-      ) : (
-        roomMessages.map((msg, index) => (
-          <div key={index} className={`message-bubble ${msg.senderId === userId ? 'own' : 'other'}`}>
-            <div className="message-author">{msg.senderName}</div>
-            {msg.messageType === 'voice' ? (
-              <audio controls src={msg.content} className="voice-note" />
-            ) : msg.fileName ? (
-              <div className="file-attachment"><span>📎</span> {msg.fileName}</div>
-            ) : (
-              <div className="message-text">{msg.content}</div>
-            )}
-            <div className="message-time">{new Date(msg.timestamp).toLocaleTimeString()}</div>
-          </div>
-        ))
-      )}
-      {Object.keys(typingUsers).filter(id => id !== userId).length > 0 && (
-        <div className="typing-indicator">
-          <span className="typing-dots"><span></span><span></span><span></span></span>
-          <span>{Object.values(typingUsers).join(', ')} is typing...</span>
-        </div>
-      )}
-    </div>
-    <div className="message-input-area">
-      <input type="text" value={roomMessageInput} onChange={(e) => { setRoomMessageInput(e.target.value); handleTypingStart(currentRoom, true); }} onKeyPress={(e) => { if (e.key === 'Enter') { sendRoomMessage(); handleTypingStop(currentRoom, true); } }} onBlur={() => handleTypingStop(currentRoom, true)} placeholder={`Message #${currentRoom}...`} />
-      <button className="icon-btn-small" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>😀</button>
-      <button className="icon-btn-small" onClick={() => fileInputRef.current.click()}>📎</button>
-      <button className={`icon-btn-small ${recordingVoice ? 'recording' : ''}`} onClick={recordingVoice ? stopVoiceRecording : startVoiceRecording}>{recordingVoice ? '⏹️' : '🎤'}</button>
-      <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{display: 'none'}} />
-      <button className="send-button" onClick={sendRoomMessage}>Send</button>
-    </div>
-    {showEmojiPicker && (
-      <div className="emoji-picker">
-        {emojis.map(emoji => (
-          <button key={emoji} className="emoji-btn" onClick={() => addEmoji(emoji)}>{emoji}</button>
-        ))}
-      </div>
-    )}
-  </>
-)}
-
-{/* Friends Chat */}
-{activeTab === 'friends' && (
-  selectedFriend ? (
-    <>
-      <div className="chat-header-main">
-        <div className="chat-user-info">
-          <h3>{selectedFriend.displayName || selectedFriend.username}</h3>
-          <p>{selectedFriend.status === 'online' ? '● Online' : '○ Offline'}</p>
-        </div>
-        <div className="chat-actions">
-          <button className="icon-btn" onClick={() => blockUser(selectedFriend._id)}>🚫 Block</button>
-        </div>
-      </div>
-      <div className="messages-container">
-        {privateMessages.length === 0 ? (
-          <div className="no-messages"><p>No messages yet. Say hi! 👋</p></div>
-        ) : (
-          privateMessages.map((msg, index) => (
-            <div key={index} className={`message-bubble ${msg.sender._id === userId ? 'own' : 'other'}`}>
-              <div className="message-text">{msg.content}</div>
-              <div className="message-meta">
-                <span className="message-time">{new Date(msg.createdAt).toLocaleTimeString()}</span>
-                {msg.sender._id === userId && <span className="read-status">{msg.read ? '✓✓' : '✓'}</span>}
-              </div>
-            </div>
-          ))
-        )}
-        {Object.keys(typingUsers).length > 0 && selectedFriend && typingUsers[selectedFriend._id] && (
-          <div className="typing-indicator">
-            <span className="typing-dots"><span></span><span></span><span></span></span>
-            <span>{typingUsers[selectedFriend._id]} is typing...</span>
-          </div>
-        )}
-      </div>
-      <div className="message-input-area">
-        <input type="text" value={privateMessageInput} onChange={(e) => { setPrivateMessageInput(e.target.value); handleTypingStart(selectedFriend._id, false); }} onKeyPress={(e) => { if (e.key === 'Enter') { sendPrivateMessage(); handleTypingStop(selectedFriend._id, false); } }} onBlur={() => handleTypingStop(selectedFriend._id, false)} placeholder="Type a message..." />
-        <button className="send-button" onClick={sendPrivateMessage}>Send</button>
-      </div>
-    </>
-  ) : (
-    <div className="no-chat-selected">
-      <h2>Select a friend to start chatting</h2>
-      <p>Or add new friends from the sidebar</p>
-    </div>
-  )
-)}
-         
-          {activeTab === 'rooms' && currentRoom === 'library' && (
-            <div className="library-container">
+          {/* Exam Prep Room */}
+          {activeTab === 'rooms' && currentRoom === 'exam-prep' && (
+            <div className="exam-prep-container">
               <div className="room-content-header">
-                <h2>📚 Study Library</h2>
-                <div className="header-actions">
-                  <button className="btn-primary" onClick={() => setShowNdivhoAI(!showNdivhoAI)}>
-                    {showNdivhoAI ? 'Close Ndivho AI' : '🤖 Ask Ndivho AI'}
-                  </button>
-                  <input type="text" placeholder="Search resources..." value={librarySearch} onChange={(e) => setLibrarySearch(e.target.value)} className="search-input" />
-                  <select value={libraryFilter} onChange={(e) => setLibraryFilter(e.target.value)} className="filter-select">
-                    <option value="All">All Subjects</option>
-                    <option value="Mathematics">Mathematics</option>
-                    <option value="Physical Sciences">Physical Sciences</option>
-                    <option value="Life Sciences">Life Sciences</option>
-                    <option value="Business Studies">Business Studies</option>
-                    <option value="Computer Science">Computer Science</option>
-                    <option value="Other">Other</option>
-                  </select>
-                  <button className="btn-primary" onClick={() => setShowResourceForm(!showResourceForm)}>{showResourceForm ? 'Cancel' : '+ Share Resource'}</button>
-                </div>
+                <h2>📝 Exam Prep War Room</h2>
+                <button className="btn-primary" onClick={() => setShowThreadForm(!showThreadForm)}>{showThreadForm ? 'Cancel' : '+ New Thread'}</button>
               </div>
-              {showResourceForm && (
+              {showThreadForm && (
                 <div className="form-container">
-                  <h3>Share Study Resource</h3>
-                  <input type="text" placeholder="Resource Title" value={studyResource.title} onChange={(e) => setStudyResource({...studyResource, title: e.target.value})} />
-                  <textarea placeholder="Description" value={studyResource.description} onChange={(e) => setStudyResource({...studyResource, description: e.target.value})} />
-                  <select value={studyResource.subject} onChange={(e) => setStudyResource({...studyResource, subject: e.target.value})}>
-                    <option>Mathematics</option>
-                    <option>Physical Sciences</option>
-                    <option>Life Sciences</option>
-                    <option>Business Studies</option>
-                    <option>Computer Science</option>
-                    <option>Other</option>
-                  </select>
-                  <select value={studyResource.gradeLevel} onChange={(e) => setStudyResource({...studyResource, gradeLevel: e.target.value})}>
-                    <option>First Year</option>
-                    <option>Second Year</option>
-                    <option>Third Year</option>
-                    <option>Fourth Year</option>
-                    <option>Honours</option>
-                    <option>Masters</option>
-                    <option>PhD</option>
-                  </select>
-                  <select value={studyResource.fileType} onChange={(e) => setStudyResource({...studyResource, fileType: e.target.value})}>
-                    <option>PDF</option>
-                    <option>DOC</option>
-                    <option>DOCX</option>
-                    <option>PPT</option>
-                    <option>PPTX</option>
-                    <option>Image</option>
-                    <option>Other</option>
-                  </select>
-                  <input type="text" placeholder="Tags (comma separated)" value={studyResource.tags} onChange={(e) => setStudyResource({...studyResource, tags: e.target.value})} />
-                  <input type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*" onChange={(e) => {
+                  <h3>Create Study Thread</h3>
+                  <input type="text" placeholder="Thread Title" value={examThread.title} onChange={(e) => setExamThread({ ...examThread, title: e.target.value })} />
+                  <textarea placeholder="Your Question" value={examThread.question} onChange={(e) => setExamThread({ ...examThread, question: e.target.value })} />
+                  <input type="file" accept="image/*" onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
                       const reader = new FileReader();
-                      reader.onload = () => {
-                        setResourceFile(reader.result);
-                        setStudyResource({...studyResource, fileName: file.name, fileSize: (file.size / 1024).toFixed(2) + ' KB'});
-                      };
+                      reader.onload = () => setThreadImage(reader.result);
                       reader.readAsDataURL(file);
                     }
                   }} />
-                  {resourceFile && <div className="image-preview">📄 {studyResource.fileName} ({studyResource.fileSize})</div>}
-                  <button className="btn-primary" onClick={createStudyResource}>Share</button>
+                  {threadImage && <div className="image-preview">Image attached</div>}
+                  <button className="btn-primary" onClick={createExamThread}>Create Thread</button>
                 </div>
               )}
-              <div className="resources-list">
-                {studyResources.map(resource => (
-                  <div key={resource._id} className="resource-card">
-                    <div className="resource-icon">
-                      {resource.fileType === 'PDF' ? '📄' : resource.fileType === 'DOC' || resource.fileType === 'DOCX' ? '📝' : resource.fileType === 'PPT' || resource.fileType === 'PPTX' ? '📊' : '📁'}
+              <div className="exam-threads">
+                {examThreads.map(thread => (
+                  <div key={thread._id} className="thread-card">
+                    <div className="thread-header" onClick={() => setActiveThreadId(activeThreadId === thread._id ? null : thread._id)}>
+                      <h4>{thread.title}</h4>
+                      <p>by {thread.authorName} • {thread.replies.length} replies</p>
                     </div>
-                    <div className="resource-info">
-                      <h4>{resource.title}</h4>
-                      <p>{resource.description}</p>
-                      <p>📚 {resource.subject} • {resource.gradeLevel} • {resource.fileType}</p>
-                      <p>👤 {resource.uploaderName} • 👍 {resource.likes} • 📥 {resource.downloads}</p>
-                      {resource.tags && resource.tags.length > 0 && (
-                        <div className="resource-tags">
-                          {resource.tags.map((tag, i) => <span key={i} className="tag-small">#{tag}</span>)}
+                    {activeThreadId === thread._id && (
+                      <div className="thread-content">
+                        <p className="thread-question">{thread.question}</p>
+                        {thread.image && <img src={thread.image} alt="question" className="thread-image" />}
+                        <div className="thread-replies">
+                          {thread.replies.map((reply, i) => (
+                            <div key={i} className="reply">
+                              <strong>{reply.authorName}</strong>
+                              <p>{reply.content}</p>
+                              {reply.image && <img src={reply.image} alt="reply" className="reply-image" />}
+                            </div>
+                          ))}
                         </div>
-                      )}
-                    </div>
-                    <div className="resource-actions">
-                      <button className="btn-like-resource" onClick={() => likeResource(resource._id)}>👍 {resource.likes}</button>
-                      <button className="btn-download" onClick={() => downloadResource(resource._id)}>📥 Download</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Ndivho AI Panel (Library Popup) */}
-              {showNdivhoAI && (
-                <div className="ndivho-ai-panel">
-                  <div className="ndivho-ai-header">
-                  <div className="ndivho-ai-avatar">
-  <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%'}} />
-</div>  
-                    <div className="ndivho-ai-info">
-                      <h3>Ndivho AI</h3>
-                      <p>Your UNIVEN Study Assistant</p>
-                    </div>
-                    <button className="close-ndivho-ai" onClick={() => setShowNdivhoAI(false)}>×</button>
-                  </div>
-                  <div className="ndivho-ai-messages">
-                    {ndivhoMessages.map((msg, i) => (
-                      <div key={i} className={`ndivho-ai-message ${msg.sender}`}>
-                        <div className="ndivho-ai-message-avatar">
-                          {msg.sender === 'bot' ? '🤖' : '👤'}
-                        </div>
-                        <div className="ndivho-ai-message-content">
-                          <p>{msg.text}</p>
-                          <span className="ndivho-ai-time">{new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                        </div>
-                      </div>
-                    ))}
-                    {isAITyping && (
-                      <div className="ndivho-ai-message bot">
-                        <div className="ndivho-ai-message-avatar">🤖</div>
-                        <div className="ndivho-ai-message-content">
-                          <div className="typing-dots"><span></span><span></span><span></span></div>
+                        <div className="reply-form">
+                          <input type="text" placeholder="Your reply..." value={threadReply} onChange={(e) => setThreadReply(e.target.value)} />
+                          <button onClick={() => replyToThread(thread._id)}>Reply</button>
                         </div>
                       </div>
                     )}
                   </div>
-                  <div className="ndivho-ai-quick-actions">
-                    <button onClick={() => loadAITips('study_tips')}>📚 Study</button>
-                    <button onClick={() => loadAITips('exam')}>📝 Exam</button>
-                    <button onClick={() => loadAITips('time_management')}>⏰ Time</button>
-                    <button onClick={() => loadAITips('motivation')}>💪 Motivation</button>
-                    <button onClick={() => loadAITips('computer_science')}>💻 IT</button>
-                    <button onClick={() => loadAITips('law')}>⚖️ Law</button>
-                  </div>
-                  <div className="ndivho-ai-input-area">
-                    <input 
-                      type="text" 
-                      value={ndivhoInput}
-                      onChange={(e) => setNdivhoInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && sendToNdivhoAI()}
-                      placeholder="Ask about ANY UNIVEN module..."
-                    />
-                    <button onClick={sendToNdivhoAI}>Send</button>
-                  </div>
-                </div>
-              )}
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Other rooms (lost-found, marketplace, exam-prep, cafeteria) */}
+          {/* Cafeteria Room */}
           {activeTab === 'rooms' && currentRoom === 'cafeteria' && (
             <>
               <div className="chat-header-main">
@@ -1927,7 +2092,7 @@ function App() {
                 <button className="icon-btn-small" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>😀</button>
                 <button className="icon-btn-small" onClick={() => fileInputRef.current.click()}>📎</button>
                 <button className={`icon-btn-small ${recordingVoice ? 'recording' : ''}`} onClick={recordingVoice ? stopVoiceRecording : startVoiceRecording}>{recordingVoice ? '⏹️' : '🎤'}</button>
-                <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{display: 'none'}} />
+                <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} />
                 <button className="send-button" onClick={sendRoomMessage}>Send</button>
               </div>
               {showEmojiPicker && (
@@ -1940,50 +2105,155 @@ function App() {
             </>
           )}
 
-          {activeTab === 'friends' && (
-            selectedFriend ? (
-              <>
-                <div className="chat-header-main">
-                  <div className="chat-user-info">
-                    <h3>{selectedFriend.displayName || selectedFriend.username}</h3>
-                    <p>{selectedFriend.status === 'online' ? '● Online' : '○ Offline'}</p>
-                  </div>
-                  <div className="chat-actions">
-                    <button className="icon-btn" onClick={() => blockUser(selectedFriend._id)}>🚫 Block</button>
-                  </div>
+          {/* Library Room */}
+          {activeTab === 'rooms' && currentRoom === 'library' && (
+            <div className="library-container">
+              <div className="room-content-header">
+                <h2>📚 Study Library</h2>
+                <div className="header-actions">
+                  <button className="btn-primary" onClick={() => setShowNdivhoAI(!showNdivhoAI)}>
+                    {showNdivhoAI ? 'Close Ndivho AI' : '🤖 Ask Ndivho AI'}
+                  </button>
+                  <input type="text" placeholder="Search resources..." value={librarySearch} onChange={(e) => setLibrarySearch(e.target.value)} className="search-input" />
+                  <select value={libraryFilter} onChange={(e) => setLibraryFilter(e.target.value)} className="filter-select">
+                    <option value="All">All Subjects</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Physical Sciences">Physical Sciences</option>
+                    <option value="Life Sciences">Life Sciences</option>
+                    <option value="Business Studies">Business Studies</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <button className="btn-primary" onClick={() => setShowResourceForm(!showResourceForm)}>{showResourceForm ? 'Cancel' : '+ Share Resource'}</button>
                 </div>
-                <div className="messages-container">
-                  {privateMessages.length === 0 ? (
-                    <div className="no-messages"><p>No messages yet. Say hi! 👋</p></div>
-                  ) : (
-                    privateMessages.map((msg, index) => (
-                      <div key={index} className={`message-bubble ${msg.sender._id === userId ? 'own' : 'other'}`}>
-                        <div className="message-text">{msg.content}</div>
-                        <div className="message-meta">
-                          <span className="message-time">{new Date(msg.createdAt).toLocaleTimeString()}</span>
-                          {msg.sender._id === userId && <span className="read-status">{msg.read ? '✓✓' : '✓'}</span>}
+              </div>
+              {showResourceForm && (
+                <div className="form-container">
+                  <h3>Share Study Resource</h3>
+                  <input type="text" placeholder="Resource Title" value={studyResource.title} onChange={(e) => setStudyResource({ ...studyResource, title: e.target.value })} />
+                  <textarea placeholder="Description" value={studyResource.description} onChange={(e) => setStudyResource({ ...studyResource, description: e.target.value })} />
+                  <select value={studyResource.subject} onChange={(e) => setStudyResource({ ...studyResource, subject: e.target.value })}>
+                    <option>Mathematics</option>
+                    <option>Physical Sciences</option>
+                    <option>Life Sciences</option>
+                    <option>Business Studies</option>
+                    <option>Computer Science</option>
+                    <option>Other</option>
+                  </select>
+                  <select value={studyResource.gradeLevel} onChange={(e) => setStudyResource({ ...studyResource, gradeLevel: e.target.value })}>
+                    <option>First Year</option>
+                    <option>Second Year</option>
+                    <option>Third Year</option>
+                    <option>Fourth Year</option>
+                    <option>Honours</option>
+                    <option>Masters</option>
+                    <option>PhD</option>
+                  </select>
+                  <select value={studyResource.fileType} onChange={(e) => setStudyResource({ ...studyResource, fileType: e.target.value })}>
+                    <option>PDF</option>
+                    <option>DOC</option>
+                    <option>DOCX</option>
+                    <option>PPT</option>
+                    <option>PPTX</option>
+                    <option>Image</option>
+                    <option>Other</option>
+                  </select>
+                  <input type="text" placeholder="Tags (comma separated)" value={studyResource.tags} onChange={(e) => setStudyResource({ ...studyResource, tags: e.target.value })} />
+                  <input type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*" onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        setResourceFile(reader.result);
+                        setStudyResource({ ...studyResource, fileName: file.name, fileSize: (file.size / 1024).toFixed(2) + ' KB' });
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }} />
+                  {resourceFile && <div className="image-preview">📄 {studyResource.fileName} ({studyResource.fileSize})</div>}
+                  <button className="btn-primary" onClick={createStudyResource}>Share</button>
+                </div>
+              )}
+              <div className="resources-list">
+                {studyResources.map(resource => (
+                  <div key={resource._id} className="resource-card">
+                    <div className="resource-icon">
+                      {resource.fileType === 'PDF' ? '📄' : resource.fileType === 'DOC' || resource.fileType === 'DOCX' ? '📝' : resource.fileType === 'PPT' || resource.fileType === 'PPTX' ? '📊' : '📁'}
+                    </div>
+                    <div className="resource-info">
+                      <h4>{resource.title}</h4>
+                      <p>{resource.description}</p>
+                      <p>📚 {resource.subject} • {resource.gradeLevel} • {resource.fileType}</p>
+                      <p>👤 {resource.uploaderName} • 👍 {resource.likes} • 📥 {resource.downloads}</p>
+                      {resource.tags && resource.tags.length > 0 && (
+                        <div className="resource-tags">
+                          {resource.tags.map((tag, i) => <span key={i} className="tag-small">#{tag}</span>)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="resource-actions">
+                      <button className="btn-like-resource" onClick={() => likeResource(resource._id)}>👍 {resource.likes}</button>
+                      <button className="btn-download" onClick={() => downloadResource(resource._id)}>📥 Download</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Ndivho AI Panel */}
+              {showNdivhoAI && (
+                <div className="ndivho-ai-panel">
+                  <div className="ndivho-ai-header">
+                    <div className="ndivho-ai-avatar">
+                      <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                    </div>
+                    <div className="ndivho-ai-info">
+                      <h3>Ndivho AI</h3>
+                      <p>Your UNIVEN Study Assistant</p>
+                    </div>
+                    <button className="close-ndivho-ai" onClick={() => setShowNdivhoAI(false)}>×</button>
+                  </div>
+                  <div className="ndivho-ai-messages">
+                    {ndivhoMessages.map((msg, i) => (
+                      <div key={i} className={`ndivho-ai-message ${msg.sender}`}>
+                        <div className="ndivho-ai-message-avatar">
+                          {msg.sender === 'bot' ? '🤖' : '👤'}
+                        </div>
+                        <div className="ndivho-ai-message-content">
+                          <p>{msg.text}</p>
+                          <span className="ndivho-ai-time">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>
-                    ))
-                  )}
-                  {Object.keys(typingUsers).length > 0 && selectedFriend && typingUsers[selectedFriend._id] && (
-                    <div className="typing-indicator">
-                      <span className="typing-dots"><span></span><span></span><span></span></span>
-                      <span>{typingUsers[selectedFriend._id]} is typing...</span>
-                    </div>
-                  )}
+                    ))}
+                    {isAITyping && (
+                      <div className="ndivho-ai-message bot">
+                        <div className="ndivho-ai-message-avatar">🤖</div>
+                        <div className="ndivho-ai-message-content">
+                          <div className="typing-dots"><span></span><span></span><span></span></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="ndivho-ai-quick-actions">
+                    <button onClick={() => { }}>📚 Study</button>
+                    <button onClick={() => { }}>📝 Exam</button>
+                    <button onClick={() => { }}>⏰ Time</button>
+                    <button onClick={() => { }}>💪 Motivation</button>
+                    <button onClick={() => { }}>💻 IT</button>
+                    <button onClick={() => { }}>⚖️ Law</button>
+                  </div>
+                  <div className="ndivho-ai-input-area">
+                    <input
+                      type="text"
+                      value={ndivhoInput}
+                      onChange={(e) => setNdivhoInput(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && sendToNdivhoAI()}
+                      placeholder="Ask about ANY UNIVEN module..."
+                    />
+                    <button onClick={sendToNdivhoAI}>Send</button>
+                  </div>
                 </div>
-                <div className="message-input-area">
-                  <input type="text" value={privateMessageInput} onChange={(e) => { setPrivateMessageInput(e.target.value); handleTypingStart(selectedFriend._id, false); }} onKeyPress={(e) => { if (e.key === 'Enter') { sendPrivateMessage(); handleTypingStop(selectedFriend._id, false); } }} onBlur={() => handleTypingStop(selectedFriend._id, false)} placeholder="Type a message..." />
-                  <button className="send-button" onClick={sendPrivateMessage}>Send</button>
-                </div>
-              </>
-            ) : (
-              <div className="no-chat-selected">
-                <h2>Select a friend to start chatting</h2>
-                <p>Or add new friends from the sidebar</p>
-              </div>
-            )
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -2029,11 +2299,13 @@ function App() {
                 <input type="file" accept="image/*" onChange={handleAvatarUpload} id="avatar-input" className="file-input-hidden" />
                 <label htmlFor="avatar-input" className="change-avatar-btn">Change Photo</label>
               </div>
-              <div className="form-section"><label>Display Name</label><input type="text" value={editProfile.displayName} onChange={(e) => setEditProfile({...editProfile, displayName: e.target.value})} /></div>
-              <div className="form-section"><label>Bio</label><textarea value={editProfile.bio} onChange={(e) => setEditProfile({...editProfile, bio: e.target.value})} rows="3" /></div>
-              <div className="form-section"><label>Level of Study</label><select value={editProfile.levelOfStudy} onChange={(e) => setEditProfile({...editProfile, levelOfStudy: e.target.value})}><option>First Year</option><option>Second Year</option><option>Third Year</option><option>Fourth Year</option><option>Honours</option><option>Masters</option><option>PhD</option></select></div>
-              <div className="form-section"><label>Degree Name</label><input type="text" value={editProfile.degreeName} onChange={(e) => setEditProfile({...editProfile, degreeName: e.target.value})} placeholder="e.g., BSc Computer Science" /></div>
-              <div className="form-section"><label>Faculty</label><select value={editProfile.faculty} onChange={(e) => setEditProfile({...editProfile, faculty: e.target.value})}><option value="">Select Faculty</option><option>Agriculture, Science & Engineering</option><option>Commerce, Law & Management</option><option>Humanities, Social Sciences & Education</option><option>Health Sciences</option></select></div>
+              <div className="form-section"><label>Display Name</label><input type="text" value={editProfile.displayName} onChange={(e) => setEditProfile({ ...editProfile, displayName: e.target.value })} /></div>
+              <div className="form-section"><label>Email</label><input type="email" value={editProfile.email} onChange={(e) => setEditProfile({ ...editProfile, email: e.target.value })} /></div>
+              <div className="form-section"><label>Phone</label><input type="tel" value={editProfile.phone} onChange={(e) => setEditProfile({ ...editProfile, phone: e.target.value })} /></div>
+              <div className="form-section"><label>Bio</label><textarea value={editProfile.bio} onChange={(e) => setEditProfile({ ...editProfile, bio: e.target.value })} rows="3" /></div>
+              <div className="form-section"><label>Level of Study</label><select value={editProfile.levelOfStudy} onChange={(e) => setEditProfile({ ...editProfile, levelOfStudy: e.target.value })}><option>First Year</option><option>Second Year</option><option>Third Year</option><option>Fourth Year</option><option>Honours</option><option>Masters</option><option>PhD</option></select></div>
+              <div className="form-section"><label>Degree Name</label><input type="text" value={editProfile.degreeName} onChange={(e) => setEditProfile({ ...editProfile, degreeName: e.target.value })} placeholder="e.g., BSc Computer Science" /></div>
+              <div className="form-section"><label>Faculty</label><select value={editProfile.faculty} onChange={(e) => setEditProfile({ ...editProfile, faculty: e.target.value })}><option value="">Select Faculty</option><option>Agriculture, Science & Engineering</option><option>Commerce, Law & Management</option><option>Humanities, Social Sciences & Education</option><option>Health Sciences</option></select></div>
               <button className="btn-primary btn-save" onClick={updateProfile}>Save Profile</button>
             </div>
           </div>

@@ -1,3 +1,111 @@
+/* === MOBILE RESPONSIVE DESIGN === */
+@media (max-width: 768px) {
+  .app-container { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; max-height: 60px; overflow-x: auto; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; }
+  .sidebar-header { display: none; }
+  .nav-tabs-sidebar { display: flex; flex-direction: row; justify-content: space-around; padding: 10px; }
+  .nav-tab { font-size: 10px; padding: 5px; flex: 1; text-align: center; }
+  .rooms-list, .friends-list, .news-sidebar, .sidebar-footer { display: none; }
+  .main-chat-area { margin-bottom: 70px; width: 100%; padding: 10px; }
+  .connections-container, .news-feed-container, .lost-found-container, .marketplace-container, .exam-prep-container, .library-container { padding: 10px; }
+  .card-stack { width: 100%; }
+  .connection-card { width: 100%; margin: 10px 0; }
+  .status-form-container, .form-container { width: 100%; padding: 15px; }
+  .status-form-container textarea, .form-container input, .form-container textarea, .form-container select { width: 100%; font-size: 14px; }
+  .chat-header-main { padding: 10px; }
+  .messages-container { height: calc(100vh - 200px); }
+  .message-input-area { padding: 10px; }
+  .message-input-area input { font-size: 14px; }
+  .emoji-picker-large { grid-template-columns: repeat(6, 1fr); max-height: 200px; overflow-y: auto; }
+  .ai-room-full { padding: 10px; }
+  .ai-chat-container { height: calc(100vh - 150px); }
+  .ai-input-container { padding: 10px; }
+  .ai-input-container input { font-size: 14px; }
+  .post-card, .status-card, .market-item-card, .resource-card, .thread-card, .lost-found-card { margin: 10px 0; padding: 15px; }
+  .auth-container-modern { width: 95%; padding: 20px; }
+  .auth-form-modern input, .auth-form-modern select { font-size: 14px; }
+  .camera-preview video { width: 100%; height: auto; }
+  .search-box { width: 100%; }
+  .search-box input { width: 100%; }
+  .matches-grid { grid-template-columns: repeat(2, 1fr); }
+  .news-posts { padding: 10px; }
+  .post-images.grid { grid-template-columns: 1fr; }
+  .marketplace-grid { grid-template-columns: 1fr; }
+  .resources-list { padding: 10px; }
+  .exam-threads { padding: 10px; }
+  .ndivho-ai-panel { width: 100%; bottom: 70px; }
+  .modal-content-modern { width: 95%; max-height: 90vh; overflow-y: auto; }
+  .btn-primary, .btn-secondary { padding: 10px 15px; font-size: 14px; }
+  .user-avatar-small { width: 35px; height: 35px; }
+  .friend-avatar { width: 40px; height: 40px; }
+  .status-avatar { width: 40px; height: 40px; }
+}
+
+@media (max-width: 480px) {
+  .nav-tab { font-size: 9px; padding: 3px; }
+  .nav-tab span { display: none; }
+  .connection-card .card-info h3 { font-size: 16px; }
+  .message-bubble { max-width: 85%; }
+  .auth-title { font-size: 24px; }
+  .chat-title { display: none; }
+}
+
+/* === NDIVHO AI STYLES === */
+.ai-messages-area { flex: 1; overflow-y: auto; padding: 20px; }
+.ai-chat-message { display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-start; }
+.ai-chat-message.user { flex-direction: row-reverse; }
+.ai-chat-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.ai-chat-bubble { max-width: 70%; padding: 12px 16px; border-radius: 18px; background: #f0f0f0; }
+.ai-chat-message.user .ai-chat-bubble { background: #667eea; color: white; }
+.ai-chat-bubble p { margin: 0; line-height: 1.5; word-wrap: break-word; }
+.ai-chat-time { font-size: 11px; color: #888; margin-top: 5px; display: block; }
+.ai-input-container { display: flex; gap: 10px; padding: 15px; border-top: 1px solid #e0e0e0; }
+.ai-input-container input { flex: 1; padding: 12px 16px; border: 1px solid #ddd; border-radius: 25px; font-size: 14px; outline: none; }
+.ai-input-container input:focus { border-color: #667eea; }
+.ai-send-button { padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; }
+.ai-send-button:hover { background: #5568d3; }
+.typing-indicator { display: flex; gap: 4px; padding: 10px; }
+.typing-indicator span { width: 8px; height: 8px; background: #888; border-radius: 50%; animation: typing 1.4s infinite; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
+
+/* === CAMERA & EMOJI === */
+.camera-preview { position: relative; width: 100%; max-width: 400px; margin: 10px auto; border-radius: 10px; overflow: hidden; background: #000; }
+.camera-preview video { width: 100%; height: auto; display: block; }
+.camera-controls { position: absolute; bottom: 10px; left: 0; right: 0; display: flex; justify-content: center; gap: 10px; }
+.camera-controls button { padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; }
+.camera-controls button:first-child { background: #4CAF50; color: white; }
+.camera-controls button:last-child { background: #f44336; color: white; }
+.emoji-picker-large { position: absolute; bottom: 60px; left: 10px; background: white; border: 1px solid #ddd; border-radius: 10px; padding: 10px; display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.emoji-btn { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 5px; }
+.emoji-btn:hover { background: #f0f0f0; }
+
+/* === SEARCH & CONTACTS === */
+.search-box { display: flex; gap: 10px; margin: 10px 0; }
+.search-box input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+.search-box button { padding: 10px 15px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; }
+.search-results { max-height: 200px; overflow-y: auto; margin: 10px 0; }
+.search-result-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+.btn-sync-contacts { width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 10px 0; font-weight: bold; }
+.contacts-match-section { background: #f9f9f9; padding: 15px; border-radius: 10px; margin: 10px 0; }
+.contact-match-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; }
+
+/* === STATUS FORM === */
+.status-form-container { background: white; padding: 20px; border-radius: 15px; margin: 20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.status-form-container textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; resize: vertical; margin: 10px 0; }
+.status-char-count { text-align: right; font-size: 12px; color: #888; }
+.btn-camera { width: 100%; padding: 12px; background: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 10px 0; font-weight: bold; }
+.statuses-feed { margin: 20px 0; }
+.status-card { background: white; padding: 15px; border-radius: 15px; margin: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.status-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+.status-info h4 { margin: 0; font-size: 14px; }
+.status-info p { margin: 5px 0 0; font-size: 12px; color: #888; }
+.status-text { margin: 10px 0; line-height: 1.5; }
+.status-image { width: 100%; border-radius: 10px; margin: 10px 0; }
+.status-actions { display: flex; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; }
+.status-action-btn { flex: 1; padding: 8px; background: #f0f0f0; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+.status-action-btn:hover { background: #e0e0e0; }
 /* Base Reset */
 * {
   margin: 0;

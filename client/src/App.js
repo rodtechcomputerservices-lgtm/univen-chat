@@ -13,6 +13,9 @@ function App() {
   const [authUsername, setAuthUsername] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authDisplayName, setAuthDisplayName] = useState("");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPhone, setAuthPhone] = useState("");
+  const [authGender, setAuthGender] = useState("Male");
   const [authError, setAuthError] = useState("");
   const [userId, setUserId] = useState("");
   const [username, setUsername] = useState("");
@@ -34,6 +37,8 @@ function App() {
   });
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const [userToBlock, setUserToBlock] = useState(null);
+  
+  // Single & Mingle with Statuses
   const [connectionProfiles, setConnectionProfiles] = useState([]);
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const [userProfile, setUserProfile] = useState({
@@ -44,6 +49,12 @@ function App() {
   const [compatibility, setCompatibility] = useState({ score: 0, common: {} });
   const [showMatchPopup, setShowMatchPopup] = useState(false);
   const [newMatch, setNewMatch] = useState(null);
+  const [mingleStatuses, setMingleStatuses] = useState([]);
+  const [showStatusForm, setShowStatusForm] = useState(false);
+  const [statusText, setStatusText] = useState("");
+  const [statusImage, setStatusImage] = useState(null);
+  
+  // Lost & Found
   const [lostFoundItems, setLostFoundItems] = useState([]);
   const [showLostFoundForm, setShowLostFoundForm] = useState(false);
   const [lostFoundView, setLostFoundView] = useState("list");
@@ -54,6 +65,8 @@ function App() {
   const [itemToClaim, setItemToClaim] = useState(null);
   const [claimNotes, setClaimNotes] = useState("");
   const [lfImages, setLfImages] = useState([]);
+  
+  // Marketplace
   const [marketplaceItems, setMarketplaceItems] = useState([]);
   const [showMarketForm, setShowMarketForm] = useState(false);
   const [marketFilter, setMarketFilter] = useState("All");
@@ -63,6 +76,8 @@ function App() {
   });
   const [marketImages, setMarketImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState({});
+  
+  // Library
   const [studyResources, setStudyResources] = useState([]);
   const [showResourceForm, setShowResourceForm] = useState(false);
   const [libraryFilter, setLibraryFilter] = useState("All");
@@ -71,49 +86,218 @@ function App() {
     title: "", description: "", subject: "Other", gradeLevel: "First Year", fileType: "PDF", fileUrl: "", fileName: "", fileSize: "", tags: ""
   });
   const [resourceFile, setResourceFile] = useState(null);
+  
+  // News Feed
   const [newsPosts, setNewsPosts] = useState([]);
   const [showNewsForm, setShowNewsForm] = useState(false);
   const [newsPost, setNewsPost] = useState({ content: "", images: [], tags: "" });
   const [newsImages, setNewsImages] = useState([]);
+  
+  // Exam Prep
   const [examThreads, setExamThreads] = useState([]);
   const [showThreadForm, setShowThreadForm] = useState(false);
   const [examThread, setExamThread] = useState({ title: "", question: "", image: "" });
   const [threadImage, setThreadImage] = useState(null);
   const [activeThreadId, setActiveThreadId] = useState(null);
   const [threadReply, setThreadReply] = useState("");
+  
+  // Typing Indicators
   const [typingUsers, setTypingUsers] = useState({});
   const typingTimeout = useRef({});
+  
+  // News Feed Enhanced
   const [postReactions, setPostReactions] = useState({});
   const [postComments, setPostComments] = useState({});
   const [showComments, setShowComments] = useState({});
   const [newComment, setNewComment] = useState({});
   const [replyingTo, setReplyingTo] = useState({});
   const [showReactionPicker, setShowReactionPicker] = useState({});
+  
+  // Ndivho AI
   const [showNdivhoAI, setShowNdivhoAI] = useState(false);
   const [ndivhoMessages, setNdivhoMessages] = useState([
     { sender: 'bot', text: "Hey! I am Ndivho AI 🤖 How can I help you today?", timestamp: new Date() }
   ]);
   const [ndivhoInput, setNdivhoInput] = useState("");
   const [isAITyping, setIsAITyping] = useState(false);
+  
+  // AI Room
   const [aiRoomActive, setAiRoomActive] = useState(false);
   const [aiMessages, setAiMessages] = useState([
-    { sender: 'bot', text: "Hey! I am Ndivho AI 🤖 How can I help you today?\n\nI can help with:\n📚 Any UNIVEN module\n📝 Exam preparation\n💡 Study tips\n⏰ Time management\n💪 Motivation\n\nJust ask me anything!", timestamp: new Date() }
+    { sender: 'bot', text: "Hey! I am Ndivho AI 🤖 How can I help you today?", timestamp: new Date() }
   ]);
   const [aiInput, setAiInput] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [aiModuleCode, setAiModuleCode] = useState("");
+  
+  // UI State
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [recordingVoice, setRecordingVoice] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const fileInputRef = useRef(null);
-  const emojis = ["😀", "😂", "😍", "🤔", "👍", "❤️", "🎉", "🔥", "👏", "🙏", "💯", "✨", "📚", "🎓", "💼", "🛒"];
+  const videoRef = useRef(null);
+  const [showCamera, setShowCamera] = useState(false);
+  const [stream, setStream] = useState(null);
+  
+  // Push Notifications
+  const [notificationPermission, setNotificationPermission] = useState("default");
+  
+  // Search & Phone Sync
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [phoneContacts, setPhoneContacts] = useState([]);
+  const [contactsMatch, setContactsMatch] = useState([]);
+  const [showContactSync, setShowContactSync] = useState(false);
+  
+  // Extended Emojis (50+)
+  const emojis = [
+    "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
+    "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
+    "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🥸",
+    "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️",
+    "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡",
+    "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓",
+    "👍", "👎", "👊", "✊", "🤛", "🤜", "🤞", "✌️", "🤟", "🤘",
+    "👌", "🤌", "🤏", "👈", "👉", "👆", "👇", "☝️", "✋", "🤚",
+    "🖐️", "🖖", "👋", "🤙", "💪", "🦾", "🖕", "✍️", "🙏", "🦵",
+    "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔",
+    "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟", "☮️",
+    "✝️", "☪️", "🕉", "☸️", "✡️", "🔯", "🕎", "☯️", "☦️", "🛐",
+    "⛎", "♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐",
+    "🎓", "🎉", "🎊", "🎈", "🎁", "🎀", "🎄", "🎃", "🎂", "🍰",
+    "🍕", "🍔", "🍟", "🌭", "🍿", "🧂", "🥓", "🥚", "🧇", "🥞",
+    "🧈", "🍞", "🥐", "🥖", "🥨", "🥯", "🥪", "🥗", "🥙", "🧆"
+  ];
 
+  // Request Notification Permission
+  useEffect(() => {
+    if ("Notification" in window) {
+      Notification.requestPermission().then(permission => {
+        setNotificationPermission(permission);
+      });
+    }
+  }, []);
+
+  // Show Push Notification
+  const showNotification = (title, body) => {
+    if (notificationPermission === "granted") {
+      new Notification(title, {
+        body: body,
+        icon: "/favicon.ico"
+      });
+    }
+  };
+
+  // Camera Functions
+  const startCamera = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setStream(mediaStream);
+      setShowCamera(true);
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+      }
+    } catch (error) {
+      console.error("Error accessing camera:", error);
+      alert("Could not access camera. Please allow camera permissions.");
+    }
+  };
+
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+    setShowCamera(false);
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current) {
+      const canvas = document.createElement("canvas");
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(videoRef.current, 0, 0);
+      const imageData = canvas.toDataURL("image/png");
+      setStatusImage(imageData);
+      stopCamera();
+    }
+  };
+
+  // Phone Contact Sync
+  const syncPhoneContacts = async () => {
+    if ("contacts" in navigator) {
+      try {
+        const contacts = await navigator.contacts.select(["name", "tel"], { multiple: true });
+        const phoneNumbers = contacts.map(c => c.tel).flat().filter(t => t);
+        setPhoneContacts(contacts);
+        
+        const response = await fetch(`https://univen-chat.onrender.com/api/users/contacts-sync`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, phoneNumbers })
+        });
+        const data = await response.json();
+        setContactsMatch(data.matches || []);
+        setShowContactSync(true);
+      } catch (error) {
+        alert("Contact sync not available. You can manually search for friends.");
+        console.error("Contact sync error:", error);
+      }
+    } else {
+      const phoneNumber = prompt("Enter phone number to find friends:");
+      if (phoneNumber) {
+        const response = await fetch(`https://univen-chat.onrender.com/api/users/find-by-phone?phone=${phoneNumber}`);
+        const data = await response.json();
+        if (data.user) {
+          setContactsMatch([data.user]);
+          setShowContactSync(true);
+        } else {
+          alert("No user found with this phone number");
+        }
+      }
+    }
+  };
+
+  // User Search
+  const searchUsers = async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+    
+    try {
+      const allUsersResponse = await fetch('https://univen-chat.onrender.com/api/users');
+      const allUsersData = await allUsersResponse.json();
+      
+      const filtered = allUsersData.filter(user => 
+        user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.displayName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      
+      setSearchResults(filtered.filter(u => u._id !== userId));
+      setShowSearchResults(true);
+    } catch (error) {
+      console.error('Error searching users:', error);
+    }
+  };
+
+  // Auth Functions
   const handleRegister = async () => {
     try {
       const response = await fetch('https://univen-chat.onrender.com/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: authUsername, password: authPassword, displayName: authDisplayName })
+        body: JSON.stringify({
+          username: authUsername,
+          password: authPassword,
+          displayName: authDisplayName,
+          email: authEmail,
+          phone: authPhone,
+          gender: authGender
+        })
       });
       const data = await response.json();
       if (data.error) setAuthError(data.error);
@@ -152,10 +336,13 @@ function App() {
         fetchExamThreads();
         fetchConnectionProfiles();
         fetchMatches(data.user.id);
+        fetchMingleStatuses();
+        showNotification("Welcome to UNIVEN CHAT!", "You are now logged in.");
       }
     } catch (error) { setAuthError('Login failed'); }
   };
 
+  // Room Functions
   const fetchRooms = async () => {
     try {
       const response = await fetch('https://univen-chat.onrender.com/api/rooms');
@@ -240,6 +427,7 @@ function App() {
     }
   };
 
+  // Lost & Found Functions
   const fetchLostFoundItems = async () => {
     try {
       const response = await fetch('https://univen-chat.onrender.com/api/lost-found');
@@ -287,6 +475,7 @@ function App() {
     } catch (error) { console.error('Error returning item:', error); }
   };
 
+  // Marketplace Functions
   const fetchMarketplaceItems = async () => {
     try {
       const query = `?category=${marketFilter}&search=${marketSearch}`;
@@ -342,6 +531,7 @@ function App() {
     }));
   };
 
+  // Library Functions
   const fetchStudyResources = async () => {
     try {
       const query = `?subject=${libraryFilter}&search=${librarySearch}`;
@@ -396,6 +586,7 @@ function App() {
     } catch (error) { console.error('Error downloading:', error); }
   };
 
+  // News Feed Functions
   const fetchNewsPosts = async () => {
     try {
       const response = await fetch('https://univen-chat.onrender.com/api/news');
@@ -426,6 +617,7 @@ function App() {
     } catch (error) { console.error('Error creating post:', error); }
   };
 
+  // Exam Prep Functions
   const fetchExamThreads = async () => {
     try {
       const response = await fetch(`https://univen-chat.onrender.com/api/exam-threads/exam-prep`);
@@ -472,6 +664,7 @@ function App() {
     } catch (error) { console.error('Error replying:', error); }
   };
 
+  // Friend Functions
   const fetchFriends = async (uid) => {
     try {
       const response = await fetch(`https://univen-chat.onrender.com/api/friends/${uid}`);
@@ -516,7 +709,10 @@ function App() {
         body: JSON.stringify({ status })
       });
       fetchFriendRequests(userId);
-      if (status === 'accepted') fetchFriends(userId);
+      if (status === 'accepted') {
+        fetchFriends(userId);
+        showNotification("Friend Request Accepted!", "You are now friends!");
+      }
     } catch (error) { console.error('Error handling request:', error); }
   };
 
@@ -562,6 +758,7 @@ function App() {
     socket.emit("mark_read", { messageId });
   };
 
+  // Single & Mingle Functions
   const fetchConnectionProfiles = async () => {
     try {
       const response = await fetch('https://univen-chat.onrender.com/api/connections');
@@ -604,6 +801,7 @@ function App() {
         setNewMatch(data);
         setShowMatchPopup(true);
         fetchMatches(userId);
+        showNotification("It's a Match!", "You and someone liked each other!");
       }
       setCurrentProfileIndex(prev => prev + 1);
     } catch (error) { console.error('Error liking:', error); }
@@ -628,6 +826,48 @@ function App() {
     } catch (error) { console.error('Error calculating compatibility:', error); }
   };
 
+  // Mingle Status Functions
+  const fetchMingleStatuses = async () => {
+    try {
+      const response = await fetch(`https://univen-chat.onrender.com/api/mingle/statuses?userId=${userId}`);
+      const data = await response.json();
+      setMingleStatuses(data);
+    } catch (error) { console.error('Error fetching statuses:', error); }
+  };
+
+  const createMingleStatus = async () => {
+    if (!statusText.trim() && !statusImage) {
+      alert('Please add text or an image');
+      return;
+    }
+    
+    try {
+      const formData = new FormData();
+      formData.append('userId', userId);
+      formData.append('username', username);
+      formData.append('text', statusText);
+      if (statusImage) {
+        formData.append('image', statusImage);
+      }
+      
+      const response = await fetch('https://univen-chat.onrender.com/api/mingle/status', {
+        method: 'POST',
+        body: formData
+      });
+      
+      await response.json();
+      alert('Status posted! ✅');
+      setShowStatusForm(false);
+      setStatusText("");
+      setStatusImage(null);
+      fetchMingleStatuses();
+    } catch (error) {
+      console.error('Error creating status:', error);
+      alert('Failed to post status');
+    }
+  };
+
+  // Typing Indicator Functions
   const handleTypingStart = (targetId, isRoom = false) => {
     const key = isRoom ? `room_${currentRoom}_${userId}` : `private_${targetId}_${userId}`;
     if (typingTimeout.current[key]) clearTimeout(typingTimeout.current[key]);
@@ -645,6 +885,7 @@ function App() {
     else socket.emit("typing_stop", { receiverId: targetId, senderId: userId, senderName: username });
   };
 
+  // News Feed Enhanced Functions
   const formatTimeAgo = (date) => {
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
     if (seconds < 60) return 'just now';
@@ -718,6 +959,7 @@ function App() {
     return reactions.join(' ');
   };
 
+  // Ndivho AI Functions
   const sendToNdivhoAI = async () => {
     if (!ndivhoInput.trim()) return;
     const userMessage = ndivhoInput.trim();
@@ -741,6 +983,7 @@ function App() {
     }
   };
 
+  // AI Room Functions
   const sendToAI = async () => {
     if (!aiInput.trim()) return;
     const userMessage = aiInput.trim();
@@ -757,7 +1000,6 @@ function App() {
       setTimeout(() => {
         setAiMessages(prev => [...prev, { sender: 'bot', text: data.response, timestamp: data.timestamp }]);
         setIsAiTyping(false);
-        console.log('✅ AI Response:', data.source, 'Guides used:', data.studyGuidesUsed);
       }, 1000);
     } catch (error) {
       console.error('Error:', error);
@@ -782,24 +1024,24 @@ function App() {
         body: formData
       });
       const result = await response.json();
-      
       if (response.ok) {
         alert(result.message);
         setAiMessages(prev => [...prev, { 
           sender: 'bot', 
-          text: `✅ ${result.message}\n\nI can now answer questions about this content!`, 
+          text: `✅ ${result.message}`, 
           timestamp: new Date() 
         }]);
       } else {
-        alert(`❌ Upload failed: ${result.error || 'Unknown error'}`);
+        alert(`❌ Upload failed: ${result.error}`);
       }
       e.target.value = '';
     } catch (error) {
       console.error('Upload error:', error);
-      alert('❌ Upload failed. Please check if the server is running.');
+      alert('❌ Upload failed.');
     }
   };
 
+  // Profile Functions
   const fetchUserProfile = async (username) => {
     try {
       const response = await fetch(`https://univen-chat.onrender.com/api/profile/${username}`);
@@ -835,6 +1077,7 @@ function App() {
     } catch (error) { console.error('Error updating profile:', error); }
   };
 
+  // Socket Event Listeners
   useEffect(() => {
     socket.on("receive_room_message", (message) => {
       if (message.roomId === currentRoom) setRoomMessages(prev => [...prev, message]);
@@ -860,6 +1103,7 @@ function App() {
     };
   }, [currentRoom, selectedFriend]);
 
+  // AUTH SCREEN
   if (showAuth) {
     return (
       <div className="App auth-page">
@@ -899,6 +1143,21 @@ function App() {
                 <input type="text" value={authDisplayName} onChange={(e) => setAuthDisplayName(e.target.value)} placeholder="Your name" />
               </div>
               <div className="input-group-modern">
+                <label>Email</label>
+                <input type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} placeholder="Your email" />
+              </div>
+              <div className="input-group-modern">
+                <label>Phone Number</label>
+                <input type="tel" value={authPhone} onChange={(e) => setAuthPhone(e.target.value)} placeholder="Your phone number" />
+              </div>
+              <div className="input-group-modern">
+                <label>Gender</label>
+                <select value={authGender} onChange={(e) => setAuthGender(e.target.value)}>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+              <div className="input-group-modern">
                 <label>Password</label>
                 <input type="password" value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} placeholder="Create password" />
               </div>
@@ -911,9 +1170,11 @@ function App() {
     );
   }
 
+  // MAIN APP
   return (
     <div className="App">
       <div className="app-container">
+        {/* Sidebar */}
         <div className="sidebar">
           <div className="sidebar-header">
             <h2 className="chat-title">UNIVEN</h2>
@@ -924,7 +1185,7 @@ function App() {
           <div className="nav-tabs-sidebar">
             <button className={`nav-tab ${activeTab === 'rooms' ? 'active' : ''}`} onClick={() => setActiveTab('rooms')}>🏛️ Rooms</button>
             <button className={`nav-tab ${aiRoomActive ? 'active' : ''}`} onClick={() => { setAiRoomActive(true); setActiveTab(''); }}>🤖 Ndivho AI</button>
-            <button className={`nav-tab ${activeTab === 'connections' ? 'active' : ''}`} onClick={() => setActiveTab('connections')}>💕 Connections {matches.length > 0 && <span className="notification-badge">{matches.length}</span>}</button>
+            <button className={`nav-tab ${activeTab === 'connections' ? 'active' : ''}`} onClick={() => setActiveTab('connections')}>💕 Single & Mingle {matches.length > 0 && <span className="notification-badge">{matches.length}</span>}</button>
             <button className={`nav-tab ${activeTab === 'friends' ? 'active' : ''}`} onClick={() => setActiveTab('friends')}>👥 Friends ({friends.length})</button>
             <button className={`nav-tab ${activeTab === 'requests' ? 'active' : ''}`} onClick={() => setActiveTab('requests')}>📨 Requests ({friendRequests.length})</button>
             <button className={`nav-tab ${activeTab === 'news' ? 'active' : ''}`} onClick={() => setActiveTab('news')}>📰 News Feed</button>
@@ -945,6 +1206,49 @@ function App() {
           )}
           {activeTab === 'friends' && (
             <div className="friends-list">
+              {/* Search Users */}
+              <div className="search-users-section">
+                <h3>🔍 Find Friends</h3>
+                <div className="search-box">
+                  <input 
+                    type="text" 
+                    placeholder="Search by username..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && searchUsers()}
+                  />
+                  <button onClick={searchUsers}>🔍</button>
+                </div>
+                {showSearchResults && searchResults.length > 0 && (
+                  <div className="search-results">
+                    {searchResults.map(user => (
+                      <div key={user._id} className="search-result-item">
+                        <span>{user.displayName || user.username}</span>
+                        <button onClick={() => sendFriendRequest(user._id)}>+ Add</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <button className="btn-sync-contacts" onClick={syncPhoneContacts}>
+                  📱 Sync Phone Contacts
+                </button>
+              </div>
+
+              {/* Contact Matches */}
+              {showContactSync && contactsMatch.length > 0 && (
+                <div className="contacts-match-section">
+                  <h3>📞 Friends on UChat ({contactsMatch.length})</h3>
+                  {contactsMatch.map(user => (
+                    <div key={user._id} className="contact-match-item">
+                      <span>{user.displayName || user.username}</span>
+                      <button onClick={() => sendFriendRequest(user._id)}>+ Add</button>
+                    </div>
+                  ))}
+                  <button className="btn-close" onClick={() => setShowContactSync(false)}>Close</button>
+                </div>
+              )}
+
+              {/* Friends List */}
               {friends.map(friend => (
                 <div key={friend._id} className={`friend-item ${selectedFriend?._id === friend._id ? 'active' : ''}`} onClick={() => selectFriend(friend)}>
                   <div className="friend-avatar">
@@ -957,18 +1261,6 @@ function App() {
                   </div>
                 </div>
               ))}
-              <div className="add-friends-section">
-                <h3>Add Friends</h3>
-                {allUsers.filter(u => !friends.find(f => f._id === u._id)).map(user => (
-                  <div key={user._id} className="user-to-add">
-                    <div className="user-info-small">
-                      <span>{user.displayName || user.username}</span>
-                      <small>{user.username}</small>
-                    </div>
-                    <button className="btn-add-friend" onClick={() => sendFriendRequest(user._id)}>+ Add</button>
-                  </div>
-                ))}
-              </div>
             </div>
           )}
           {activeTab === 'requests' && (
@@ -1031,7 +1323,9 @@ function App() {
           </div>
         </div>
 
+        {/* Main Content */}
         <div className="main-chat-area">
+          {/* AI ROOM */}
           {aiRoomActive && (
             <div className="ai-room-full">
               <div className="ai-room-header-full">
@@ -1109,14 +1403,86 @@ function App() {
             </div>
           )}
 
+          {/* Single & Mingle with Statuses */}
           {activeTab === 'connections' && (
             <div className="connections-container">
               <div className="connections-header">
-                <h2>💕 Campus Connections</h2>
-                <button className="btn-primary" onClick={() => setShowProfileForm(!showProfileForm)}>
-                  {showProfileForm ? 'Cancel' : 'Create My Profile'}
-                </button>
+                <h2>💕 Single & Mingle</h2>
+                <div className="connections-actions">
+                  <button className="btn-secondary" onClick={() => setShowStatusForm(!showStatusForm)}>
+                    {showStatusForm ? 'Cancel' : '📸 Post Status'}
+                  </button>
+                  <button className="btn-primary" onClick={() => setShowProfileForm(!showProfileForm)}>
+                    {showProfileForm ? 'Cancel' : 'Create Profile'}
+                  </button>
+                </div>
               </div>
+              
+              {/* Status Post Form */}
+              {showStatusForm && (
+                <div className="status-form-container">
+                  <h3>Post Your Status</h3>
+                  <textarea 
+                    placeholder="What's on your mind?" 
+                    value={statusText}
+                    onChange={(e) => setStatusText(e.target.value)}
+                    maxLength={200}
+                  />
+                  <div className="status-char-count">{statusText.length}/200</div>
+                  
+                  {/* Camera Button */}
+                  <button className="btn-camera" onClick={startCamera}>
+                    📷 Take Photo
+                  </button>
+                  
+                  {/* Camera Preview */}
+                  {showCamera && (
+                    <div className="camera-preview">
+                      <video ref={videoRef} autoPlay playsInline></video>
+                      <div className="camera-controls">
+                        <button onClick={capturePhoto}>📸 Capture</button>
+                        <button onClick={stopCamera}>❌ Cancel</button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={(e) => setStatusImage(e.target.files[0])}
+                  />
+                  {statusImage && <div className="image-preview">📷 Image selected</div>}
+                  <button className="btn-primary" onClick={createMingleStatus}>Post Status</button>
+                </div>
+              )}
+              
+              {/* Statuses Feed */}
+              {mingleStatuses.length > 0 && (
+                <div className="statuses-feed">
+                  <h3>📱 Recent Statuses</h3>
+                  {mingleStatuses.map(status => (
+                    <div key={status._id} className="status-card">
+                      <div className="status-header">
+                        <div className="status-avatar">
+                          {status.user?.avatar ? <img src={status.user.avatar} alt="" /> : <span>👤</span>}
+                        </div>
+                        <div className="status-info">
+                          <h4>{status.user?.displayName || status.username}</h4>
+                          <p>{formatTimeAgo(status.createdAt)}</p>
+                        </div>
+                      </div>
+                      {status.text && <p className="status-text">{status.text}</p>}
+                      {status.image && <img src={status.image} alt="status" className="status-image" />}
+                      <div className="status-actions">
+                        <button className="status-action-btn">❤️ Like</button>
+                        <button className="status-action-btn">💬 Comment</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Profile Form */}
               {showProfileForm && (
                 <div className="form-container">
                   <h3>Create Your Connection Profile</h3>
@@ -1135,7 +1501,9 @@ function App() {
                   <button className="btn-primary" onClick={createConnectionProfile}>Save Profile</button>
                 </div>
               )}
-              {!showProfileForm && connectionProfiles.length > 0 && currentProfileIndex < connectionProfiles.length ? (
+              
+              {/* Connection Cards */}
+              {!showProfileForm && !showStatusForm && connectionProfiles.length > 0 && currentProfileIndex < connectionProfiles.length ? (
                 <div className="card-stack">
                   {connectionProfiles.slice(currentProfileIndex, currentProfileIndex + 1).map(profile => (
                     <div key={profile._id} className="connection-card" onClick={() => calculateCompatibility(profile.user)}>
@@ -1193,6 +1561,8 @@ function App() {
                   <p>Check back later for new connections</p>
                 </div>
               )}
+              
+              {/* Matches */}
               {matches.length > 0 && (
                 <div className="matches-section">
                   <h3>💕 Your Matches ({matches.length})</h3>
@@ -1215,6 +1585,68 @@ function App() {
             </div>
           )}
 
+          {/* Friends Chat */}
+          {activeTab === 'friends' && (
+            selectedFriend ? (
+              <>
+                <div className="chat-header-main">
+                  <div className="chat-user-info">
+                    <h3>{selectedFriend.displayName || selectedFriend.username}</h3>
+                    <p>{selectedFriend.status === 'online' ? '● Online' : '○ Offline'}</p>
+                  </div>
+                  <div className="chat-actions">
+                    <button className="icon-btn" onClick={() => blockUser(selectedFriend._id)}>🚫 Block</button>
+                  </div>
+                </div>
+                <div className="messages-container">
+                  {privateMessages.length === 0 ? (
+                    <div className="no-messages"><p>No messages yet. Say hi! 👋</p></div>
+                  ) : (
+                    privateMessages.map((msg, index) => (
+                      <div key={index} className={`message-bubble ${msg.sender._id === userId ? 'own' : 'other'}`}>
+                        <div className="message-text">{msg.content}</div>
+                        <div className="message-meta">
+                          <span className="message-time">{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                          {msg.sender._id === userId && <span className="read-status">{msg.read ? '✓✓' : '✓'}</span>}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  {Object.keys(typingUsers).length > 0 && selectedFriend && typingUsers[selectedFriend._id] && (
+                    <div className="typing-indicator">
+                      <span className="typing-dots"><span></span><span></span><span></span></span>
+                      <span>{typingUsers[selectedFriend._id]} is typing...</span>
+                    </div>
+                  )}
+                </div>
+                <div className="message-input-area">
+                  <input type="text" value={privateMessageInput} onChange={(e) => { setPrivateMessageInput(e.target.value); handleTypingStart(selectedFriend._id, false); }} onKeyPress={(e) => { if (e.key === 'Enter') { sendPrivateMessage(); handleTypingStop(selectedFriend._id, false); } }} onBlur={() => handleTypingStop(selectedFriend._id, false)} placeholder="Type a message..." />
+                  <button className="icon-btn-small" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>😀</button>
+                  <button className="icon-btn-small" onClick={() => fileInputRef.current.click()}>📎</button>
+                  <button className={`icon-btn-small ${recordingVoice ? 'recording' : ''}`} onClick={recordingVoice ? stopVoiceRecording : startVoiceRecording}>{recordingVoice ? '⏹️' : '🎤'}</button>
+                  <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{display: 'none'}} />
+                  <button className="send-button" onClick={sendPrivateMessage}>Send</button>
+                </div>
+                {showEmojiPicker && (
+                  <div className="emoji-picker-large">
+                    {emojis.map(emoji => (
+                      <button key={emoji} className="emoji-btn" onClick={() => {
+                        setPrivateMessageInput(prev => prev + emoji);
+                        setShowEmojiPicker(false);
+                      }}>{emoji}</button>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="no-chat-selected">
+                <h2>Select a friend to start chatting</h2>
+                <p>Or search for new friends using the search bar</p>
+              </div>
+            )
+          )}
+
+          {/* News Feed */}
           {activeTab === 'news' && (
             <div className="news-feed-container">
               <div className="news-feed-header">
@@ -1356,6 +1788,7 @@ function App() {
             </div>
           )}
 
+          {/* Lost & Found Room */}
           {activeTab === 'rooms' && currentRoom === 'lost-found' && (
             <div className="lost-found-container">
               <div className="room-content-header">
@@ -1443,6 +1876,7 @@ function App() {
             </div>
           )}
 
+          {/* Marketplace Room */}
           {activeTab === 'rooms' && currentRoom === 'marketplace' && (
             <div className="marketplace-container">
               <div className="room-content-header">
@@ -1533,6 +1967,7 @@ function App() {
             </div>
           )}
 
+          {/* Exam Prep Room */}
           {activeTab === 'rooms' && currentRoom === 'exam-prep' && (
             <div className="exam-prep-container">
               <div className="room-content-header">
@@ -1588,6 +2023,7 @@ function App() {
             </div>
           )}
 
+          {/* Cafeteria Room */}
           {activeTab === 'rooms' && currentRoom === 'cafeteria' && (
             <>
               <div className="chat-header-main">
@@ -1630,7 +2066,7 @@ function App() {
                 <button className="send-button" onClick={sendRoomMessage}>Send</button>
               </div>
               {showEmojiPicker && (
-                <div className="emoji-picker">
+                <div className="emoji-picker-large">
                   {emojis.map(emoji => (
                     <button key={emoji} className="emoji-btn" onClick={() => addEmoji(emoji)}>{emoji}</button>
                   ))}
@@ -1639,52 +2075,7 @@ function App() {
             </>
           )}
 
-          {activeTab === 'friends' && (
-            selectedFriend ? (
-              <>
-                <div className="chat-header-main">
-                  <div className="chat-user-info">
-                    <h3>{selectedFriend.displayName || selectedFriend.username}</h3>
-                    <p>{selectedFriend.status === 'online' ? '● Online' : '○ Offline'}</p>
-                  </div>
-                  <div className="chat-actions">
-                    <button className="icon-btn" onClick={() => blockUser(selectedFriend._id)}>🚫 Block</button>
-                  </div>
-                </div>
-                <div className="messages-container">
-                  {privateMessages.length === 0 ? (
-                    <div className="no-messages"><p>No messages yet. Say hi! 👋</p></div>
-                  ) : (
-                    privateMessages.map((msg, index) => (
-                      <div key={index} className={`message-bubble ${msg.sender._id === userId ? 'own' : 'other'}`}>
-                        <div className="message-text">{msg.content}</div>
-                        <div className="message-meta">
-                          <span className="message-time">{new Date(msg.createdAt).toLocaleTimeString()}</span>
-                          {msg.sender._id === userId && <span className="read-status">{msg.read ? '✓✓' : '✓'}</span>}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                  {Object.keys(typingUsers).length > 0 && selectedFriend && typingUsers[selectedFriend._id] && (
-                    <div className="typing-indicator">
-                      <span className="typing-dots"><span></span><span></span><span></span></span>
-                      <span>{typingUsers[selectedFriend._id]} is typing...</span>
-                    </div>
-                  )}
-                </div>
-                <div className="message-input-area">
-                  <input type="text" value={privateMessageInput} onChange={(e) => { setPrivateMessageInput(e.target.value); handleTypingStart(selectedFriend._id, false); }} onKeyPress={(e) => { if (e.key === 'Enter') { sendPrivateMessage(); handleTypingStop(selectedFriend._id, false); } }} onBlur={() => handleTypingStop(selectedFriend._id, false)} placeholder="Type a message..." />
-                  <button className="send-button" onClick={sendPrivateMessage}>Send</button>
-                </div>
-              </>
-            ) : (
-              <div className="no-chat-selected">
-                <h2>Select a friend to start chatting</h2>
-                <p>Or add new friends from the sidebar</p>
-              </div>
-            )
-          )}
-
+          {/* Library Room */}
           {activeTab === 'rooms' && currentRoom === 'library' && (
             <div className="library-container">
               <div className="room-content-header">
@@ -1778,6 +2169,7 @@ function App() {
                 ))}
               </div>
 
+              {/* Ndivho AI Panel */}
               {showNdivhoAI && (
                 <div className="ndivho-ai-panel">
                   <div className="ndivho-ai-header">
@@ -1836,6 +2228,7 @@ function App() {
         </div>
       </div>
 
+      {/* Modals */}
       {showMatchPopup && (
         <div className="modal-overlay" onClick={() => setShowMatchPopup(false)}>
           <div className="match-popup" onClick={(e) => e.stopPropagation()}>

@@ -1,13 +1,11 @@
-/* eslint-disable */
 import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import "./App.css";
 
-const socket = io.connect("https://univen-chat.onrender.com", {
-  transports: ['websocket']
-});
+const socket = io.connect("https://univen-chat.onrender.com");
 
 function App() {
+  // === AUTH STATE ===
   const [showAuth, setShowAuth] = useState(true);
   const [isLogin, setIsLogin] = useState(true);
   const [authUsername, setAuthUsername] = useState("");
@@ -16,29 +14,47 @@ function App() {
   const [authEmail, setAuthEmail] = useState("");
   const [authPhone, setAuthPhone] = useState("");
   const [authGender, setAuthGender] = useState("Male");
+  const [authFaculty, setAuthFaculty] = useState("");
+  const [authLevelOfStudy, setAuthLevelOfStudy] = useState("First Year");
+  const [authRelationshipStatus, setAuthRelationshipStatus] = useState("Single");
+  const [authJoinMingle, setAuthJoinMingle] = useState(false);
   const [authError, setAuthError] = useState("");
+
+  // === USER STATE ===
   const [userId, setUserId] = useState("");
   const [username, setUsername] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
+  const [userGender, setUserGender] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [userPhone, setUserPhone] = useState("");
+
+  // === FRIENDS STATE ===
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [privateMessages, setPrivateMessages] = useState([]);
   const [privateMessageInput, setPrivateMessageInput] = useState("");
+
+  // === ROOMS STATE ===
   const [rooms, setRooms] = useState([]);
   const [currentRoom, setCurrentRoom] = useState("cafeteria");
   const [roomMessages, setRoomMessages] = useState([]);
   const [roomMessageInput, setRoomMessageInput] = useState("");
+
+  // === NAVIGATION STATE ===
   const [activeTab, setActiveTab] = useState("rooms");
   const [showProfile, setShowProfile] = useState(false);
   const [editProfile, setEditProfile] = useState({
-    displayName: "", bio: "", avatar: "", levelOfStudy: "", degreeName: "", faculty: "", race: "", ethnicGroup: ""
+    displayName: "", bio: "", avatar: "", levelOfStudy: "", degreeName: "", faculty: "", race: "", ethnicGroup: "", email: "", phone: ""
   });
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const [userToBlock, setUserToBlock] = useState(null);
-  
-  // Single & Mingle with Statuses
+
+  // === SINGLE & MINGLE STATE ===
   const [connectionProfiles, setConnectionProfiles] = useState([]);
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const [userProfile, setUserProfile] = useState({
@@ -53,8 +69,8 @@ function App() {
   const [showStatusForm, setShowStatusForm] = useState(false);
   const [statusText, setStatusText] = useState("");
   const [statusImage, setStatusImage] = useState(null);
-  
-  // Lost & Found
+
+  // === LOST & FOUND STATE ===
   const [lostFoundItems, setLostFoundItems] = useState([]);
   const [showLostFoundForm, setShowLostFoundForm] = useState(false);
   const [lostFoundView, setLostFoundView] = useState("list");
@@ -65,8 +81,8 @@ function App() {
   const [itemToClaim, setItemToClaim] = useState(null);
   const [claimNotes, setClaimNotes] = useState("");
   const [lfImages, setLfImages] = useState([]);
-  
-  // Marketplace
+
+  // === MARKETPLACE STATE ===
   const [marketplaceItems, setMarketplaceItems] = useState([]);
   const [showMarketForm, setShowMarketForm] = useState(false);
   const [marketFilter, setMarketFilter] = useState("All");
@@ -76,8 +92,8 @@ function App() {
   });
   const [marketImages, setMarketImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState({});
-  
-  // Library
+
+  // === LIBRARY STATE ===
   const [studyResources, setStudyResources] = useState([]);
   const [showResourceForm, setShowResourceForm] = useState(false);
   const [libraryFilter, setLibraryFilter] = useState("All");
@@ -86,42 +102,42 @@ function App() {
     title: "", description: "", subject: "Other", gradeLevel: "First Year", fileType: "PDF", fileUrl: "", fileName: "", fileSize: "", tags: ""
   });
   const [resourceFile, setResourceFile] = useState(null);
-  
-  // News Feed
+
+  // === NEWS FEED STATE ===
   const [newsPosts, setNewsPosts] = useState([]);
   const [showNewsForm, setShowNewsForm] = useState(false);
   const [newsPost, setNewsPost] = useState({ content: "", images: [], tags: "" });
   const [newsImages, setNewsImages] = useState([]);
-  
-  // Exam Prep
+
+  // === EXAM PREP STATE ===
   const [examThreads, setExamThreads] = useState([]);
   const [showThreadForm, setShowThreadForm] = useState(false);
   const [examThread, setExamThread] = useState({ title: "", question: "", image: "" });
   const [threadImage, setThreadImage] = useState(null);
   const [activeThreadId, setActiveThreadId] = useState(null);
   const [threadReply, setThreadReply] = useState("");
-  
-  // Typing Indicators
+
+  // === TYPING INDICATORS STATE ===
   const [typingUsers, setTypingUsers] = useState({});
   const typingTimeout = useRef({});
-  
-  // News Feed Enhanced
+
+  // === NEWS FEED ENHANCED STATE ===
   const [postReactions, setPostReactions] = useState({});
   const [postComments, setPostComments] = useState({});
   const [showComments, setShowComments] = useState({});
   const [newComment, setNewComment] = useState({});
   const [replyingTo, setReplyingTo] = useState({});
   const [showReactionPicker, setShowReactionPicker] = useState({});
-  
-  // Ndivho AI
+
+  // === NDIVHO AI STATE ===
   const [showNdivhoAI, setShowNdivhoAI] = useState(false);
   const [ndivhoMessages, setNdivhoMessages] = useState([
     { sender: 'bot', text: "Hey! I am Ndivho AI 🤖 How can I help you today?", timestamp: new Date() }
   ]);
   const [ndivhoInput, setNdivhoInput] = useState("");
   const [isAITyping, setIsAITyping] = useState(false);
-  
-  // AI Room
+
+  // === AI ROOM STATE ===
   const [aiRoomActive, setAiRoomActive] = useState(false);
   const [aiMessages, setAiMessages] = useState([
     { sender: 'bot', text: "Hey! I am Ndivho AI 🤖 How can I help you today?", timestamp: new Date() }
@@ -129,162 +145,16 @@ function App() {
   const [aiInput, setAiInput] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [aiModuleCode, setAiModuleCode] = useState("");
-  
-  // UI State
+
+  // === UI STATE ===
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [recordingVoice, setRecordingVoice] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const fileInputRef = useRef(null);
-  const videoRef = useRef(null);
-  const [showCamera, setShowCamera] = useState(false);
-  const [stream, setStream] = useState(null);
-  
-  // Push Notifications
-  const [notificationPermission, setNotificationPermission] = useState("default");
-  
-  // Search & Phone Sync
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [showSearchResults, setShowSearchResults] = useState(false);
-  const [phoneContacts, setPhoneContacts] = useState([]);
-  const [contactsMatch, setContactsMatch] = useState([]);
-  const [showContactSync, setShowContactSync] = useState(false);
-  
-  // Extended Emojis (250+)
-  const emojis = [
-    "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
-    "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
-    "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🥸",
-    "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️",
-    "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡",
-    "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓",
-    "👍", "👎", "👊", "✊", "🤛", "🤜", "🤞", "✌️", "🤟", "🤘",
-    "👌", "🤌", "🤏", "👈", "👉", "👆", "👇", "☝️", "✋", "🤚",
-    "🖐️", "🖖", "👋", "🤙", "💪", "🦾", "🖕", "✍️", "🙏", "🦵",
-    "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔",
-    "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟", "☮️",
-    "✝️", "☪️", "🕉", "☸️", "✡️", "🔯", "🕎", "☯️", "☦️", "🛐",
-    "⛎", "♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐",
-    "🎓", "🎉", "🎊", "🎈", "🎁", "🎀", "🎄", "🎃", "🎂", "🍰",
-    "🍕", "🍔", "🍟", "🌭", "🍿", "🧂", "🥓", "🥚", "🧇", "🥞",
-    "🧈", "🍞", "🥐", "🥖", "🥨", "🥯", "🥪", "🥗", "🥙", "🧆"
-  ];
 
-  // Request Notification Permission
-  useEffect(() => {
-    if ("Notification" in window) {
-      Notification.requestPermission().then(permission => {
-        setNotificationPermission(permission);
-      });
-    }
-  }, []);
+  const emojis = ["😀", "😂", "😍", "🤔", "👍", "❤️", "🎉", "🔥", "👏", "🙏", "💯", "✨", "📚", "🎓", "💼", "🛒"];
 
-  // Show Push Notification
-  const showNotification = (title, body) => {
-    if (notificationPermission === "granted") {
-      new Notification(title, {
-        body: body,
-        icon: "/favicon.ico"
-      });
-    }
-  };
-
-  // Camera Functions
-  const startCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
-      setStream(mediaStream);
-      setShowCamera(true);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
-    } catch (error) {
-      console.error("Error accessing camera:", error);
-      alert("Could not access camera. Please allow camera permissions.");
-    }
-  };
-
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
-    }
-    setShowCamera(false);
-  };
-
-  const capturePhoto = () => {
-    if (videoRef.current) {
-      const canvas = document.createElement("canvas");
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(videoRef.current, 0, 0);
-      const imageData = canvas.toDataURL("image/png");
-      setStatusImage(imageData);
-      stopCamera();
-    }
-  };
-
-  // Phone Contact Sync
-  const syncPhoneContacts = async () => {
-    if ("contacts" in navigator) {
-      try {
-        const contacts = await navigator.contacts.select(["name", "tel"], { multiple: true });
-        const phoneNumbers = contacts.map(c => c.tel).flat().filter(t => t);
-        setPhoneContacts(contacts);
-        
-        const response = await fetch(`https://univen-chat.onrender.com/api/users/contacts-sync`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId, phoneNumbers })
-        });
-        const data = await response.json();
-        setContactsMatch(data.matches || []);
-        setShowContactSync(true);
-      } catch (error) {
-        alert("Contact sync not available. You can manually search for friends.");
-        console.error("Contact sync error:", error);
-      }
-    } else {
-      const phoneNumber = prompt("Enter phone number to find friends:");
-      if (phoneNumber) {
-        const response = await fetch(`https://univen-chat.onrender.com/api/users/find-by-phone?phone=${phoneNumber}`);
-        const data = await response.json();
-        if (data.user) {
-          setContactsMatch([data.user]);
-          setShowContactSync(true);
-        } else {
-          alert("No user found with this phone number");
-        }
-      }
-    }
-  };
-
-  // User Search
-  const searchUsers = async () => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      setShowSearchResults(false);
-      return;
-    }
-    
-    try {
-      const allUsersResponse = await fetch('https://univen-chat.onrender.com/api/users');
-      const allUsersData = await allUsersResponse.json();
-      
-      const filtered = allUsersData.filter(user => 
-        user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.displayName.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      
-      setSearchResults(filtered.filter(u => u._id !== userId));
-      setShowSearchResults(true);
-    } catch (error) {
-      console.error('Error searching users:', error);
-    }
-  };
-
-  // Auth Functions
+  // === AUTH FUNCTIONS ===
   const handleRegister = async () => {
     try {
       const response = await fetch('https://univen-chat.onrender.com/api/register', {
@@ -296,7 +166,11 @@ function App() {
           displayName: authDisplayName,
           email: authEmail,
           phone: authPhone,
-          gender: authGender
+          gender: authGender,
+          faculty: authFaculty,
+          levelOfStudy: authLevelOfStudy,
+          relationshipStatus: authRelationshipStatus,
+          joinMingle: authJoinMingle
         })
       });
       const data = await response.json();
@@ -305,7 +179,9 @@ function App() {
         alert('Registration successful! Please login. ✅');
         setIsLogin(true);
       }
-    } catch (error) { setAuthError('Registration failed'); }
+    } catch (error) {
+      setAuthError('Registration failed');
+    }
   };
 
   const handleLogin = async () => {
@@ -321,8 +197,13 @@ function App() {
         setUserId(data.user.id);
         setUsername(data.user.username);
         setCurrentUser(data.user);
+        setUserGender(data.user.gender || "Male");
+        setUserEmail(data.user.email || "");
+        setUserPhone(data.user.phone || "");
         setShowAuth(false);
         socket.emit("register_user", data.user.id);
+        
+        // Fetch all data for logged-in user
         fetchRooms();
         fetchFriends(data.user.id);
         fetchFriendRequests(data.user.id);
@@ -337,19 +218,46 @@ function App() {
         fetchConnectionProfiles();
         fetchMatches(data.user.id);
         fetchMingleStatuses();
-        showNotification("Welcome to UNIVEN CHAT!", "You are now logged in.");
       }
-    } catch (error) { setAuthError('Login failed'); }
+    } catch (error) {
+      setAuthError('Login failed');
+    }
   };
 
-  // Room Functions
+  const handleLogout = () => {
+    // Clear all state to prevent data leakage
+    setUserId("");
+    setUsername("");
+    setCurrentUser(null);
+    setUserGender("");
+    setUserEmail("");
+    setUserPhone("");
+    setFriends([]);
+    setFriendRequests([]);
+    setAllUsers([]);
+    setSearchResults([]);
+    setShowSearchResults(false);
+    setSelectedFriend(null);
+    setPrivateMessages([]);
+    setRoomMessages([]);
+    setConnectionProfiles([]);
+    setMatches([]);
+    setMingleStatuses([]);
+    setShowAuth(true);
+    setActiveTab("rooms");
+    setSearchQuery("");
+  };
+
+  // === ROOM FUNCTIONS ===
   const fetchRooms = async () => {
     try {
       const response = await fetch('https://univen-chat.onrender.com/api/rooms');
       const data = await response.json();
       setRooms(data);
       if (data.length > 0) setCurrentRoom(data[0].id);
-    } catch (error) { console.error('Error fetching rooms:', error); }
+    } catch (error) {
+      console.error('Error fetching rooms:', error);
+    }
   };
 
   const joinRoom = (roomId) => {
@@ -427,13 +335,39 @@ function App() {
     }
   };
 
-  // Lost & Found Functions
+  // === USER SEARCH FUNCTIONS ===
+  const searchUsers = async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+    
+    try {
+      const allUsersResponse = await fetch('https://univen-chat.onrender.com/api/users');
+      const allUsersData = await allUsersResponse.json();
+      
+      const filtered = allUsersData.filter(user => 
+        user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.displayName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      
+      setSearchResults(filtered.filter(u => u._id !== userId));
+      setShowSearchResults(true);
+    } catch (error) {
+      console.error('Error searching users:', error);
+    }
+  };
+
+  // === LOST & FOUND FUNCTIONS ===
   const fetchLostFoundItems = async () => {
     try {
       const response = await fetch('https://univen-chat.onrender.com/api/lost-found');
       const data = await response.json();
       setLostFoundItems(data);
-    } catch (error) { console.error('Error fetching lost & found:', error); }
+    } catch (error) {
+      console.error('Error fetching lost & found:', error);
+    }
   };
 
   const createLostFoundItem = async () => {
@@ -449,7 +383,9 @@ function App() {
       setLostFoundItem({ type: "Found", title: "", description: "", location: "", date: "", images: [], contactInfo: "" });
       setLfImages([]);
       fetchLostFoundItems();
-    } catch (error) { console.error('Error creating item:', error); }
+    } catch (error) {
+      console.error('Error creating item:', error);
+    }
   };
 
   const claimItem = async () => {
@@ -464,7 +400,9 @@ function App() {
       setItemToClaim(null);
       setClaimNotes("");
       fetchLostFoundItems();
-    } catch (error) { console.error('Error claiming item:', error); }
+    } catch (error) {
+      console.error('Error claiming item:', error);
+    }
   };
 
   const returnItem = async (itemId) => {
@@ -472,17 +410,21 @@ function App() {
       await fetch(`https://univen-chat.onrender.com/api/lost-found/${itemId}/return`, { method: 'PUT' });
       alert('Item marked as returned! ✅');
       fetchLostFoundItems();
-    } catch (error) { console.error('Error returning item:', error); }
+    } catch (error) {
+      console.error('Error returning item:', error);
+    }
   };
 
-  // Marketplace Functions
+  // === MARKETPLACE FUNCTIONS ===
   const fetchMarketplaceItems = async () => {
     try {
       const query = `?category=${marketFilter}&search=${marketSearch}`;
       const response = await fetch(`https://univen-chat.onrender.com/api/marketplace${query}`);
       const data = await response.json();
       setMarketplaceItems(data);
-    } catch (error) { console.error('Error fetching marketplace:', error); }
+    } catch (error) {
+      console.error('Error fetching marketplace:', error);
+    }
   };
 
   useEffect(() => {
@@ -502,7 +444,9 @@ function App() {
       setMarketItem({ title: "", description: "", price: "", category: "Other", condition: "Good", images: [], contactInfo: "" });
       setMarketImages([]);
       fetchMarketplaceItems();
-    } catch (error) { console.error('Error creating item:', error); }
+    } catch (error) {
+      console.error('Error creating item:', error);
+    }
   };
 
   const markInterested = async (itemId) => {
@@ -514,7 +458,9 @@ function App() {
       });
       alert('Seller notified of your interest! 💬');
       fetchMarketplaceItems();
-    } catch (error) { console.error('Error marking interested:', error); }
+    } catch (error) {
+      console.error('Error marking interested:', error);
+    }
   };
 
   const nextImage = (itemId, max) => {
@@ -531,14 +477,16 @@ function App() {
     }));
   };
 
-  // Library Functions
+  // === LIBRARY FUNCTIONS ===
   const fetchStudyResources = async () => {
     try {
       const query = `?subject=${libraryFilter}&search=${librarySearch}`;
       const response = await fetch(`https://univen-chat.onrender.com/api/study-resources${query}`);
       const data = await response.json();
       setStudyResources(data);
-    } catch (error) { console.error('Error fetching resources:', error); }
+    } catch (error) {
+      console.error('Error fetching resources:', error);
+    }
   };
 
   useEffect(() => {
@@ -564,7 +512,9 @@ function App() {
       setStudyResource({ title: "", description: "", subject: "Other", gradeLevel: "First Year", fileType: "PDF", fileUrl: "", fileName: "", fileSize: "", tags: "" });
       setResourceFile(null);
       fetchStudyResources();
-    } catch (error) { console.error('Error creating resource:', error); }
+    } catch (error) {
+      console.error('Error creating resource:', error);
+    }
   };
 
   const likeResource = async (id) => {
@@ -575,7 +525,9 @@ function App() {
         body: JSON.stringify({ userId })
       });
       fetchStudyResources();
-    } catch (error) { console.error('Error liking resource:', error); }
+    } catch (error) {
+      console.error('Error liking resource:', error);
+    }
   };
 
   const downloadResource = async (id) => {
@@ -583,16 +535,20 @@ function App() {
       await fetch(`https://univen-chat.onrender.com/api/study-resources/${id}/download`, { method: 'PUT' });
       alert('Download started! 📥');
       fetchStudyResources();
-    } catch (error) { console.error('Error downloading:', error); }
+    } catch (error) {
+      console.error('Error downloading:', error);
+    }
   };
 
-  // News Feed Functions
+  // === NEWS FEED FUNCTIONS ===
   const fetchNewsPosts = async () => {
     try {
       const response = await fetch('https://univen-chat.onrender.com/api/news');
       const data = await response.json();
       setNewsPosts(data);
-    } catch (error) { console.error('Error fetching news:', error); }
+    } catch (error) {
+      console.error('Error fetching news:', error);
+    }
   };
 
   const createNewsPost = async () => {
@@ -614,16 +570,20 @@ function App() {
       setNewsPost({ content: "", images: [], tags: "" });
       setNewsImages([]);
       fetchNewsPosts();
-    } catch (error) { console.error('Error creating post:', error); }
+    } catch (error) {
+      console.error('Error creating post:', error);
+    }
   };
 
-  // Exam Prep Functions
+  // === EXAM PREP FUNCTIONS ===
   const fetchExamThreads = async () => {
     try {
       const response = await fetch(`https://univen-chat.onrender.com/api/exam-threads/exam-prep`);
       const data = await response.json();
       setExamThreads(data);
-    } catch (error) { console.error('Error fetching threads:', error); }
+    } catch (error) {
+      console.error('Error fetching threads:', error);
+    }
   };
 
   const createExamThread = async () => {
@@ -645,7 +605,9 @@ function App() {
       setExamThread({ title: "", question: "", image: "" });
       setThreadImage(null);
       fetchExamThreads();
-    } catch (error) { console.error('Error creating thread:', error); }
+    } catch (error) {
+      console.error('Error creating thread:', error);
+    }
   };
 
   const replyToThread = async (threadId) => {
@@ -661,16 +623,20 @@ function App() {
       });
       setThreadReply("");
       fetchExamThreads();
-    } catch (error) { console.error('Error replying:', error); }
+    } catch (error) {
+      console.error('Error replying:', error);
+    }
   };
 
-  // Friend Functions
+  // === FRIEND FUNCTIONS ===
   const fetchFriends = async (uid) => {
     try {
       const response = await fetch(`https://univen-chat.onrender.com/api/friends/${uid}`);
       const data = await response.json();
       setFriends(data);
-    } catch (error) { console.error('Error fetching friends:', error); }
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+    }
   };
 
   const fetchFriendRequests = async (uid) => {
@@ -678,15 +644,19 @@ function App() {
       const response = await fetch(`https://univen-chat.onrender.com/api/friend-requests/${uid}`);
       const data = await response.json();
       setFriendRequests(data);
-    } catch (error) { console.error('Error fetching requests:', error); }
+    } catch (error) {
+      console.error('Error fetching requests:', error);
+    }
   };
 
   const fetchAllUsers = async () => {
     try {
       const response = await fetch('https://univen-chat.onrender.com/api/users');
       const data = await response.json();
-      setAllUsers(data.filter(u => u.username !== authUsername));
-    } catch (error) { console.error('Error fetching users:', error); }
+      setAllUsers(data.filter(u => u.username !== username));
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
   };
 
   const sendFriendRequest = async (receiverId) => {
@@ -698,7 +668,9 @@ function App() {
       });
       alert('Friend request sent!');
       fetchFriendRequests(userId);
-    } catch (error) { console.error('Error sending request:', error); }
+    } catch (error) {
+      console.error('Error sending request:', error);
+    }
   };
 
   const handleFriendRequest = async (requestId, status) => {
@@ -709,11 +681,10 @@ function App() {
         body: JSON.stringify({ status })
       });
       fetchFriendRequests(userId);
-      if (status === 'accepted') {
-        fetchFriends(userId);
-        showNotification("Friend Request Accepted!", "You are now friends!");
-      }
-    } catch (error) { console.error('Error handling request:', error); }
+      if (status === 'accepted') fetchFriends(userId);
+    } catch (error) {
+      console.error('Error handling request:', error);
+    }
   };
 
   const blockUser = (blockedUserId) => {
@@ -732,7 +703,10 @@ function App() {
       alert('User blocked successfully');
       setShowBlockConfirm(false);
       setUserToBlock(null);
-    } catch (error) { console.error('Error blocking:', error); alert('Failed to block user'); }
+    } catch (error) {
+      console.error('Error blocking:', error);
+      alert('Failed to block user');
+    }
   };
 
   const selectFriend = async (friend) => {
@@ -741,7 +715,9 @@ function App() {
       const response = await fetch(`https://univen-chat.onrender.com/api/messages/${userId}/${friend._id}`);
       const data = await response.json();
       setPrivateMessages(data);
-    } catch (error) { console.error('Error fetching messages:', error); }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
   };
 
   const sendPrivateMessage = async () => {
@@ -758,13 +734,15 @@ function App() {
     socket.emit("mark_read", { messageId });
   };
 
-  // Single & Mingle Functions
+  // === SINGLE & MINGLE FUNCTIONS ===
   const fetchConnectionProfiles = async () => {
     try {
       const response = await fetch('https://univen-chat.onrender.com/api/connections');
       const data = await response.json();
       setConnectionProfiles(data.filter(p => p.user.toString() !== userId));
-    } catch (error) { console.error('Error fetching connections:', error); }
+    } catch (error) {
+      console.error('Error fetching connections:', error);
+    }
   };
 
   const fetchMatches = async (uid) => {
@@ -772,7 +750,9 @@ function App() {
       const response = await fetch(`https://univen-chat.onrender.com/api/connections/matches/${uid}`);
       const data = await response.json();
       setMatches(data);
-    } catch (error) { console.error('Error fetching matches:', error); }
+    } catch (error) {
+      console.error('Error fetching matches:', error);
+    }
   };
 
   const createConnectionProfile = async () => {
@@ -786,7 +766,9 @@ function App() {
       alert('Profile created! ✅');
       setShowProfileForm(false);
       fetchConnectionProfiles();
-    } catch (error) { console.error('Error creating profile:', error); }
+    } catch (error) {
+      console.error('Error creating profile:', error);
+    }
   };
 
   const likeProfile = async (likedId) => {
@@ -801,10 +783,11 @@ function App() {
         setNewMatch(data);
         setShowMatchPopup(true);
         fetchMatches(userId);
-        showNotification("It's a Match!", "You and someone liked each other!");
       }
       setCurrentProfileIndex(prev => prev + 1);
-    } catch (error) { console.error('Error liking:', error); }
+    } catch (error) {
+      console.error('Error liking:', error);
+    }
   };
 
   const passProfile = async (passedId) => {
@@ -815,7 +798,9 @@ function App() {
         body: JSON.stringify({ passerId: userId, passedId })
       });
       setCurrentProfileIndex(prev => prev + 1);
-    } catch (error) { console.error('Error passing:', error); }
+    } catch (error) {
+      console.error('Error passing:', error);
+    }
   };
 
   const calculateCompatibility = async (profileId) => {
@@ -823,16 +808,20 @@ function App() {
       const response = await fetch(`https://univen-chat.onrender.com/api/connections/compatibility/${userId}/${profileId}`);
       const data = await response.json();
       setCompatibility(data);
-    } catch (error) { console.error('Error calculating compatibility:', error); }
+    } catch (error) {
+      console.error('Error calculating compatibility:', error);
+    }
   };
 
-  // Mingle Status Functions
+  // === MINGLE STATUS FUNCTIONS ===
   const fetchMingleStatuses = async () => {
     try {
       const response = await fetch(`https://univen-chat.onrender.com/api/mingle/statuses?userId=${userId}`);
       const data = await response.json();
       setMingleStatuses(data);
-    } catch (error) { console.error('Error fetching statuses:', error); }
+    } catch (error) {
+      console.error('Error fetching statuses:', error);
+    }
   };
 
   const createMingleStatus = async () => {
@@ -867,7 +856,7 @@ function App() {
     }
   };
 
-  // Typing Indicator Functions
+  // === TYPING INDICATOR FUNCTIONS ===
   const handleTypingStart = (targetId, isRoom = false) => {
     const key = isRoom ? `room_${currentRoom}_${userId}` : `private_${targetId}_${userId}`;
     if (typingTimeout.current[key]) clearTimeout(typingTimeout.current[key]);
@@ -880,12 +869,15 @@ function App() {
 
   const handleTypingStop = (targetId, isRoom = false) => {
     const key = isRoom ? `room_${currentRoom}_${userId}` : `private_${targetId}_${userId}`;
-    if (typingTimeout.current[key]) { clearTimeout(typingTimeout.current[key]); delete typingTimeout.current[key]; }
+    if (typingTimeout.current[key]) {
+      clearTimeout(typingTimeout.current[key]);
+      delete typingTimeout.current[key];
+    }
     if (isRoom) socket.emit("typing_stop", { roomId: currentRoom, senderId: userId, senderName: username });
     else socket.emit("typing_stop", { receiverId: targetId, senderId: userId, senderName: username });
   };
 
-  // News Feed Enhanced Functions
+  // === NEWS FEED ENHANCED FUNCTIONS ===
   const formatTimeAgo = (date) => {
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
     if (seconds < 60) return 'just now';
@@ -901,13 +893,16 @@ function App() {
   const reactToPost = async (postId, reaction) => {
     try {
       const response = await fetch(`https://univen-chat.onrender.com/api/news/${postId}/react`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, reaction })
       });
       const updatedPost = await response.json();
       setPostReactions(prev => ({ ...prev, [postId]: updatedPost.reactionCounts }));
       setShowReactionPicker(prev => ({ ...prev, [postId]: false }));
-    } catch (error) { console.error('Error reacting:', error); }
+    } catch (error) {
+      console.error('Error reacting:', error);
+    }
   };
 
   const addComment = async (postId, parentId = null) => {
@@ -915,39 +910,59 @@ function App() {
     if (!content) return;
     try {
       const response = await fetch(`https://univen-chat.onrender.com/api/news/${postId}/comment`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, username, content, parentId })
       });
       const comment = await response.json();
       setPostComments(prev => ({ ...prev, [postId]: [...(prev[postId] || []), comment] }));
-      if (parentId) { setNewComment(prev => ({ ...prev, [`${postId}_${parentId}`]: '' })); setReplyingTo(prev => ({ ...prev, [postId]: null })); }
-      else setNewComment(prev => ({ ...prev, [postId]: '' }));
-    } catch (error) { console.error('Error adding comment:', error); }
+      if (parentId) {
+        setNewComment(prev => ({ ...prev, [`${postId}_${parentId}`]: '' }));
+        setReplyingTo(prev => ({ ...prev, [postId]: null }));
+      } else {
+        setNewComment(prev => ({ ...prev, [postId]: '' }));
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
   };
 
   const likeComment = async (postId, commentId) => {
     try {
       const response = await fetch(`https://univen-chat.onrender.com/api/news/${postId}/comment/${commentId}/like`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
       });
       const updatedComment = await response.json();
       setPostComments(prev => ({ ...prev, [postId]: prev[postId]?.map(c => c._id === commentId ? updatedComment : c) || [] }));
-    } catch (error) { console.error('Error liking comment:', error); }
+    } catch (error) {
+      console.error('Error liking comment:', error);
+    }
   };
 
   const sharePost = async (postId) => {
-    try { await fetch(`https://univen-chat.onrender.com/api/news/${postId}/share`, { method: 'POST' }); alert('Post shared! 🔗'); }
-    catch (error) { console.error('Error sharing:', error); }
+    try {
+      await fetch(`https://univen-chat.onrender.com/api/news/${postId}/share`, { method: 'POST' });
+      alert('Post shared! 🔗');
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
   };
 
-  const toggleComments = (postId) => { setShowComments(prev => ({ ...prev, [postId]: !prev[postId] })); if (!showComments[postId]) fetchPostComments(postId); };
+  const toggleComments = (postId) => {
+    setShowComments(prev => ({ ...prev, [postId]: !prev[postId] }));
+    if (!showComments[postId]) fetchPostComments(postId);
+  };
 
   const fetchPostComments = async (postId) => {
     try {
       const response = await fetch(`https://univen-chat.onrender.com/api/news/${postId}/comments`);
       const comments = await response.json();
       setPostComments(prev => ({ ...prev, [postId]: comments }));
-    } catch (error) { console.error('Error fetching comments:', error); }
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
   };
 
   const getReactionsSummary = (counts) => {
@@ -959,7 +974,7 @@ function App() {
     return reactions.join(' ');
   };
 
-  // === NDIVHO AI FUNCTIONS (FIXED) ===
+  // === NDIVHO AI FUNCTIONS ===
   const sendToNdivhoAI = async () => {
     if (!ndivhoInput.trim()) return;
     const userMessage = ndivhoInput.trim();
@@ -979,12 +994,11 @@ function App() {
       }, 1000);
     } catch (error) {
       console.error('Error:', error);
-      setNdivhoMessages(prev => [...prev, { sender: 'bot', text: "Sorry, I'm having trouble connecting. Please try again.", timestamp: new Date() }]);
       setIsAITyping(false);
     }
   };
 
-  // === AI ROOM FUNCTIONS (FIXED) ===
+  // === AI ROOM FUNCTIONS ===
   const sendToAI = async () => {
     if (!aiInput.trim()) return;
     const userMessage = aiInput.trim();
@@ -1004,7 +1018,6 @@ function App() {
       }, 1000);
     } catch (error) {
       console.error('Error:', error);
-      setAiMessages(prev => [...prev, { sender: 'bot', text: "Sorry, I'm having trouble connecting. Please try again.", timestamp: new Date() }]);
       setIsAiTyping(false);
     }
   };
@@ -1028,10 +1041,10 @@ function App() {
       const result = await response.json();
       if (response.ok) {
         alert(result.message);
-        setAiMessages(prev => [...prev, { 
-          sender: 'bot', 
-          text: `✅ ${result.message}`, 
-          timestamp: new Date() 
+        setAiMessages(prev => [...prev, {
+          sender: 'bot',
+          text: `✅ ${result.message}`,
+          timestamp: new Date()
         }]);
       } else {
         alert(`❌ Upload failed: ${result.error}`);
@@ -1043,31 +1056,40 @@ function App() {
     }
   };
 
-  // Profile Functions
+  // === PROFILE FUNCTIONS ===
   const fetchUserProfile = async (username) => {
     try {
       const response = await fetch(`https://univen-chat.onrender.com/api/profile/${username}`);
       const user = await response.json();
       setEditProfile({
-        displayName: user.displayName || "", bio: user.bio || "", avatar: user.avatar || "",
-        levelOfStudy: user.levelOfStudy || "First Year", degreeName: user.degreeName || "",
-        faculty: user.faculty || "", race: user.race || "", ethnicGroup: user.ethnicGroup || ""
+        displayName: user.displayName || "",
+        bio: user.bio || "",
+        avatar: user.avatar || "",
+        levelOfStudy: user.levelOfStudy || "First Year",
+        degreeName: user.degreeName || "",
+        faculty: user.faculty || "",
+        race: user.race || "",
+        ethnicGroup: user.ethnicGroup || "",
+        email: user.email || "",
+        phone: user.phone || ""
       });
-    } catch (error) { console.error('Error fetching profile:', error); }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
   };
 
   const handleAvatarUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => setEditProfile({...editProfile, avatar: reader.result});
+      reader.onloadend = () => setEditProfile({ ...editProfile, avatar: reader.result });
       reader.readAsDataURL(file);
     }
   };
 
   const updateProfile = async () => {
     try {
-      const response = await fetch(`https://univen-chat.onrender.com/api/profile/${authUsername}`, {
+      const response = await fetch(`https://univen-chat.onrender.com/api/profile/${username}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editProfile)
@@ -1076,10 +1098,12 @@ function App() {
       setCurrentUser(updatedUser);
       setShowProfile(false);
       alert('Profile updated! ✅');
-    } catch (error) { console.error('Error updating profile:', error); }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
   };
 
-  // Socket Event Listeners
+  // === SOCKET EVENT LISTENERS ===
   useEffect(() => {
     socket.on("receive_room_message", (message) => {
       if (message.roomId === currentRoom) setRoomMessages(prev => [...prev, message]);
@@ -1105,7 +1129,7 @@ function App() {
     };
   }, [currentRoom, selectedFriend]);
 
-  // AUTH SCREEN
+  // === AUTH SCREEN ===
   if (showAuth) {
     return (
       <div className="App auth-page">
@@ -1160,6 +1184,44 @@ function App() {
                 </select>
               </div>
               <div className="input-group-modern">
+                <label>Faculty</label>
+                <select value={authFaculty} onChange={(e) => setAuthFaculty(e.target.value)}>
+                  <option value="">Select Faculty</option>
+                  <option>Agriculture, Science & Engineering</option>
+                  <option>Commerce, Law & Management</option>
+                  <option>Humanities, Social Sciences & Education</option>
+                  <option>Health Sciences</option>
+                </select>
+              </div>
+              <div className="input-group-modern">
+                <label>Level of Study</label>
+                <select value={authLevelOfStudy} onChange={(e) => setAuthLevelOfStudy(e.target.value)}>
+                  <option>First Year</option>
+                  <option>Second Year</option>
+                  <option>Third Year</option>
+                  <option>Fourth Year</option>
+                  <option>Honours</option>
+                  <option>Masters</option>
+                  <option>PhD</option>
+                </select>
+              </div>
+              <div className="input-group-modern">
+                <label>Relationship Status</label>
+                <select value={authRelationshipStatus} onChange={(e) => setAuthRelationshipStatus(e.target.value)}>
+                  <option value="Single">Single</option>
+                  <option value="In Relationship">In Relationship</option>
+                  <option value="It's Complicated">It's Complicated</option>
+                </select>
+              </div>
+              {authRelationshipStatus === 'Single' && (
+                <div className="input-group-modern checkbox-group">
+                  <label>
+                    <input type="checkbox" checked={authJoinMingle} onChange={(e) => setAuthJoinMingle(e.target.checked)} />
+                    Join Single & Mingle automatically
+                  </label>
+                </div>
+              )}
+              <div className="input-group-modern">
                 <label>Password</label>
                 <input type="password" value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} placeholder="Create password" />
               </div>
@@ -1172,7 +1234,7 @@ function App() {
     );
   }
 
-  // MAIN APP
+  // === MAIN APP ===
   return (
     <div className="App">
       <div className="app-container">
@@ -1187,7 +1249,9 @@ function App() {
           <div className="nav-tabs-sidebar">
             <button className={`nav-tab ${activeTab === 'rooms' ? 'active' : ''}`} onClick={() => setActiveTab('rooms')}>🏛️ Rooms</button>
             <button className={`nav-tab ${aiRoomActive ? 'active' : ''}`} onClick={() => { setAiRoomActive(true); setActiveTab(''); }}>🤖 Ndivho AI</button>
-            <button className={`nav-tab ${activeTab === 'connections' ? 'active' : ''}`} onClick={() => setActiveTab('connections')}>💕 Single & Mingle {matches.length > 0 && <span className="notification-badge">{matches.length}</span>}</button>
+            <button className={`nav-tab ${activeTab === 'connections' ? 'active' : ''}`} onClick={() => setActiveTab('connections')}>
+              💕 Single & Mingle {matches.length > 0 && <span className="notification-badge">{matches.length}</span>}
+            </button>
             <button className={`nav-tab ${activeTab === 'friends' ? 'active' : ''}`} onClick={() => setActiveTab('friends')}>👥 Friends ({friends.length})</button>
             <button className={`nav-tab ${activeTab === 'requests' ? 'active' : ''}`} onClick={() => setActiveTab('requests')}>📨 Requests ({friendRequests.length})</button>
             <button className={`nav-tab ${activeTab === 'news' ? 'active' : ''}`} onClick={() => setActiveTab('news')}>📰 News Feed</button>
@@ -1208,47 +1272,42 @@ function App() {
           )}
           {activeTab === 'friends' && (
             <div className="friends-list">
-              {/* Search Users */}
-              <div className="search-users-section">
-                <h3>🔍 Find Friends</h3>
-                <div className="search-box">
-                  <input 
-                    type="text" 
-                    placeholder="Search by username..." 
+              {/* Modern Search Bar */}
+              <div className="search-section">
+                <div className="search-box-modern">
+                  <input
+                    type="text"
+                    placeholder="Search users by username..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && searchUsers()}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      if (e.target.value.trim()) {
+                        searchUsers();
+                      } else {
+                        setShowSearchResults(false);
+                      }
+                    }}
+                    className="search-input-modern"
                   />
-                  <button onClick={searchUsers}>🔍</button>
+                  <button onClick={searchUsers} className="search-button">🔍</button>
                 </div>
                 {showSearchResults && searchResults.length > 0 && (
-                  <div className="search-results">
+                  <div className="search-results-modern">
                     {searchResults.map(user => (
                       <div key={user._id} className="search-result-item">
-                        <span>{user.displayName || user.username}</span>
-                        <button onClick={() => sendFriendRequest(user._id)}>+ Add</button>
+                        <div className="result-avatar">
+                          {user.avatar ? <img src={user.avatar} alt="" /> : <span>👤</span>}
+                        </div>
+                        <div className="result-info">
+                          <h4>{user.displayName || user.username}</h4>
+                          <p>@{user.username}</p>
+                        </div>
+                        <button className="btn-add-friend" onClick={() => sendFriendRequest(user._id)}>+ Add</button>
                       </div>
                     ))}
                   </div>
                 )}
-                <button className="btn-sync-contacts" onClick={syncPhoneContacts}>
-                  📱 Sync Phone Contacts
-                </button>
               </div>
-
-              {/* Contact Matches */}
-              {showContactSync && contactsMatch.length > 0 && (
-                <div className="contacts-match-section">
-                  <h3>📞 Friends on UChat ({contactsMatch.length})</h3>
-                  {contactsMatch.map(user => (
-                    <div key={user._id} className="contact-match-item">
-                      <span>{user.displayName || user.username}</span>
-                      <button onClick={() => sendFriendRequest(user._id)}>+ Add</button>
-                    </div>
-                  ))}
-                  <button className="btn-close" onClick={() => setShowContactSync(false)}>Close</button>
-                </div>
-              )}
 
               {/* Friends List */}
               {friends.map(friend => (
@@ -1290,7 +1349,7 @@ function App() {
               </button>
               {showNewsForm && (
                 <div className="form-container">
-                  <textarea placeholder="What's happening?" value={newsPost.content} onChange={(e) => setNewsPost({...newsPost, content: e.target.value})} />
+                  <textarea placeholder="What's happening?" value={newsPost.content} onChange={(e) => setNewsPost({ ...newsPost, content: e.target.value })} />
                   <input type="file" accept="image/*" multiple onChange={async (e) => {
                     const files = Array.from(e.target.files);
                     const imagePromises = files.map(file => {
@@ -1304,7 +1363,7 @@ function App() {
                     setNewsImages(images);
                   }} />
                   {newsImages.length > 0 && <p className="image-preview-count">{newsImages.length} image(s) selected</p>}
-                  <input type="text" placeholder="Tags (comma separated)" value={newsPost.tags} onChange={(e) => setNewsPost({...newsPost, tags: e.target.value})} />
+                  <input type="text" placeholder="Tags (comma separated)" value={newsPost.tags} onChange={(e) => setNewsPost({ ...newsPost, tags: e.target.value })} />
                   <button className="btn-primary" onClick={createNewsPost}>Publish</button>
                 </div>
               )}
@@ -1317,11 +1376,11 @@ function App() {
               </div>
               <div className="user-details">
                 <h4>{editProfile.displayName || username}</h4>
-                {currentUser?.role === 'founder' && <p className="user-status" style={{color: '#feca57'}}>👑 Founder</p>}
+                {currentUser?.role === 'founder' && <p className="user-status" style={{ color: '#feca57' }}>👑 Founder</p>}
                 {currentUser?.role !== 'founder' && <p className="user-status">● Online</p>}
               </div>
             </div>
-            <button className="logout-btn" onClick={() => setShowAuth(true)}>Logout</button>
+            <button className="logout-btn" onClick={handleLogout}>Logout</button>
           </div>
         </div>
 
@@ -1333,7 +1392,7 @@ function App() {
               <div className="ai-room-header-full">
                 <div className="ai-header-left">
                   <div className="ai-avatar-large">
-                    <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%'}} />
+                    <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                   </div>
                   <div className="ai-title-section">
                     <h2>Ndivho AI</h2>
@@ -1341,17 +1400,17 @@ function App() {
                   </div>
                 </div>
                 <div className="ai-header-right">
-                  <input 
-                    type="text" 
-                    placeholder="Module Code (optional)" 
+                  <input
+                    type="text"
+                    placeholder="Module Code (optional)"
                     value={aiModuleCode}
                     onChange={(e) => setAiModuleCode(e.target.value.toUpperCase())}
                     className="ai-module-code-input"
                   />
                   <label className="ai-upload-button-header">
-                    <input 
-                      type="file" 
-                      accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp,.bmp" 
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp,.bmp"
                       onChange={handleAiFileUpload}
                       style={{ display: 'none' }}
                     />
@@ -1366,7 +1425,7 @@ function App() {
                     <div key={i} className={`ai-chat-message ${msg.sender}`}>
                       <div className="ai-chat-avatar">
                         {msg.sender === 'bot' ? (
-                          <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%'}} />
+                          <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                         ) : (
                           '👤'
                         )}
@@ -1374,7 +1433,7 @@ function App() {
                       <div className="ai-chat-bubble">
                         <p>{msg.text}</p>
                         <span className="ai-chat-time">
-                          {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
                     </div>
@@ -1391,8 +1450,8 @@ function App() {
                   )}
                 </div>
                 <div className="ai-input-container">
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={aiInput}
                     onChange={(e) => setAiInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && sendToAI()}
@@ -1419,45 +1478,28 @@ function App() {
                   </button>
                 </div>
               </div>
-              
+
               {/* Status Post Form */}
               {showStatusForm && (
                 <div className="status-form-container">
                   <h3>Post Your Status</h3>
-                  <textarea 
-                    placeholder="What's on your mind?" 
+                  <textarea
+                    placeholder="What's on your mind?"
                     value={statusText}
                     onChange={(e) => setStatusText(e.target.value)}
                     maxLength={200}
                   />
                   <div className="status-char-count">{statusText.length}/200</div>
-                  
-                  {/* Camera Button */}
-                  <button className="btn-camera" onClick={startCamera}>
-                    📷 Take Photo
-                  </button>
-                  
-                  {/* Camera Preview */}
-                  {showCamera && (
-                    <div className="camera-preview">
-                      <video ref={videoRef} autoPlay playsInline></video>
-                      <div className="camera-controls">
-                        <button onClick={capturePhoto}>📸 Capture</button>
-                        <button onClick={stopCamera}>❌ Cancel</button>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <input 
-                    type="file" 
-                    accept="image/*" 
+                  <input
+                    type="file"
+                    accept="image/*"
                     onChange={(e) => setStatusImage(e.target.files[0])}
                   />
-                  {statusImage && <div className="image-preview">📷 Image selected</div>}
+                  {statusImage && <div className="image-preview">📷 {statusImage.name}</div>}
                   <button className="btn-primary" onClick={createMingleStatus}>Post Status</button>
                 </div>
               )}
-              
+
               {/* Statuses Feed */}
               {mingleStatuses.length > 0 && (
                 <div className="statuses-feed">
@@ -1483,27 +1525,27 @@ function App() {
                   ))}
                 </div>
               )}
-              
+
               {/* Profile Form */}
               {showProfileForm && (
                 <div className="form-container">
                   <h3>Create Your Connection Profile</h3>
-                  <input type="number" placeholder="Age" value={userProfile.age} onChange={(e) => setUserProfile({...userProfile, age: e.target.value})} />
-                  <input type="text" placeholder="Faculty" value={userProfile.faculty} onChange={(e) => setUserProfile({...userProfile, faculty: e.target.value})} />
-                  <textarea placeholder="Bio (keep it fun!)" value={userProfile.bio} onChange={(e) => setUserProfile({...userProfile, bio: e.target.value})} />
-                  <select value={userProfile.lookingFor} onChange={(e) => setUserProfile({...userProfile, lookingFor: e.target.value})}>
+                  <input type="number" placeholder="Age" value={userProfile.age} onChange={(e) => setUserProfile({ ...userProfile, age: e.target.value })} />
+                  <input type="text" placeholder="Faculty" value={userProfile.faculty} onChange={(e) => setUserProfile({ ...userProfile, faculty: e.target.value })} />
+                  <textarea placeholder="Bio (keep it fun!)" value={userProfile.bio} onChange={(e) => setUserProfile({ ...userProfile, bio: e.target.value })} />
+                  <select value={userProfile.lookingFor} onChange={(e) => setUserProfile({ ...userProfile, lookingFor: e.target.value })}>
                     <option value="Friends">Friends</option>
                     <option value="Study Buddy">Study Buddy</option>
                     <option value="Partner">Looking for a Partner</option>
                     <option value="Business Collab">Business Collab</option>
                   </select>
-                  <input type="text" placeholder="Interests (comma separated)" value={userProfile.interests.join(', ')} onChange={(e) => setUserProfile({...userProfile, interests: e.target.value.split(',').map(i => i.trim())})} />
-                  <input type="text" placeholder="Music (comma separated)" value={userProfile.music.join(', ')} onChange={(e) => setUserProfile({...userProfile, music: e.target.value.split(',').map(m => m.trim())})} />
-                  <input type="text" placeholder="Campus Hotspots (e.g., Block 6, Library)" value={userProfile.campusHotspots.join(', ')} onChange={(e) => setUserProfile({...userProfile, campusHotspots: e.target.value.split(',').map(h => h.trim())})} />
+                  <input type="text" placeholder="Interests (comma separated)" value={userProfile.interests.join(', ')} onChange={(e) => setUserProfile({ ...userProfile, interests: e.target.value.split(',').map(i => i.trim()) })} />
+                  <input type="text" placeholder="Music (comma separated)" value={userProfile.music.join(', ')} onChange={(e) => setUserProfile({ ...userProfile, music: e.target.value.split(',').map(m => m.trim()) })} />
+                  <input type="text" placeholder="Campus Hotspots (e.g., Block 6, Library)" value={userProfile.campusHotspots.join(', ')} onChange={(e) => setUserProfile({ ...userProfile, campusHotspots: e.target.value.split(',').map(h => h.trim()) })} />
                   <button className="btn-primary" onClick={createConnectionProfile}>Save Profile</button>
                 </div>
               )}
-              
+
               {/* Connection Cards */}
               {!showProfileForm && !showStatusForm && connectionProfiles.length > 0 && currentProfileIndex < connectionProfiles.length ? (
                 <div className="card-stack">
@@ -1529,7 +1571,7 @@ function App() {
                           <div className="vibe-meter">
                             <div className="vibe-label">{compatibility.score}% Match</div>
                             <div className="vibe-progress">
-                              <div className="vibe-fill" style={{width: `${compatibility.score}%`}}></div>
+                              <div className="vibe-fill" style={{ width: `${compatibility.score}%` }}></div>
                             </div>
                             <p className="vibe-reason">
                               {compatibility.common.interests?.length > 0 && `Both love ${compatibility.common.interests.slice(0, 2).join(', ')}`}
@@ -1563,7 +1605,7 @@ function App() {
                   <p>Check back later for new connections</p>
                 </div>
               )}
-              
+
               {/* Matches */}
               {matches.length > 0 && (
                 <div className="matches-section">
@@ -1623,22 +1665,8 @@ function App() {
                 </div>
                 <div className="message-input-area">
                   <input type="text" value={privateMessageInput} onChange={(e) => { setPrivateMessageInput(e.target.value); handleTypingStart(selectedFriend._id, false); }} onKeyPress={(e) => { if (e.key === 'Enter') { sendPrivateMessage(); handleTypingStop(selectedFriend._id, false); } }} onBlur={() => handleTypingStop(selectedFriend._id, false)} placeholder="Type a message..." />
-                  <button className="icon-btn-small" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>😀</button>
-                  <button className="icon-btn-small" onClick={() => fileInputRef.current.click()}>📎</button>
-                  <button className={`icon-btn-small ${recordingVoice ? 'recording' : ''}`} onClick={recordingVoice ? stopVoiceRecording : startVoiceRecording}>{recordingVoice ? '⏹️' : '🎤'}</button>
-                  <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{display: 'none'}} />
                   <button className="send-button" onClick={sendPrivateMessage}>Send</button>
                 </div>
-                {showEmojiPicker && (
-                  <div className="emoji-picker-large">
-                    {emojis.map(emoji => (
-                      <button key={emoji} className="emoji-btn" onClick={() => {
-                        setPrivateMessageInput(prev => prev + emoji);
-                        setShowEmojiPicker(false);
-                      }}>{emoji}</button>
-                    ))}
-                  </div>
-                )}
               </>
             ) : (
               <div className="no-chat-selected">
@@ -1668,7 +1696,7 @@ function App() {
                       <p>Share your thoughts with the campus...</p>
                     </div>
                   </div>
-                  <textarea className="post-input" placeholder="What's on your mind?" value={newsPost.content} maxLength={500} onChange={(e) => setNewsPost({...newsPost, content: e.target.value})} />
+                  <textarea className="post-input" placeholder="What's on your mind?" value={newsPost.content} maxLength={500} onChange={(e) => setNewsPost({ ...newsPost, content: e.target.value })} />
                   <div className="post-input-footer">
                     <div className="char-counter">{newsPost.content.length}/500</div>
                     <div className="post-actions">
@@ -1804,15 +1832,15 @@ function App() {
               {showLostFoundForm && (
                 <div className="form-container">
                   <h3>Post Lost/Found Item</h3>
-                  <select value={lostFoundItem.type} onChange={(e) => setLostFoundItem({...lostFoundItem, type: e.target.value})}>
+                  <select value={lostFoundItem.type} onChange={(e) => setLostFoundItem({ ...lostFoundItem, type: e.target.value })}>
                     <option value="Found">I Found Something</option>
                     <option value="Lost">I Lost Something</option>
                   </select>
-                  <input type="text" placeholder="Item Title" value={lostFoundItem.title} onChange={(e) => setLostFoundItem({...lostFoundItem, title: e.target.value})} />
-                  <textarea placeholder="Description" value={lostFoundItem.description} onChange={(e) => setLostFoundItem({...lostFoundItem, description: e.target.value})} />
-                  <input type="text" placeholder="Location" value={lostFoundItem.location} onChange={(e) => setLostFoundItem({...lostFoundItem, location: e.target.value})} />
-                  <input type="date" value={lostFoundItem.date} onChange={(e) => setLostFoundItem({...lostFoundItem, date: e.target.value})} />
-                  <input type="text" placeholder="Contact Info" value={lostFoundItem.contactInfo} onChange={(e) => setLostFoundItem({...lostFoundItem, contactInfo: e.target.value})} />
+                  <input type="text" placeholder="Item Title" value={lostFoundItem.title} onChange={(e) => setLostFoundItem({ ...lostFoundItem, title: e.target.value })} />
+                  <textarea placeholder="Description" value={lostFoundItem.description} onChange={(e) => setLostFoundItem({ ...lostFoundItem, description: e.target.value })} />
+                  <input type="text" placeholder="Location" value={lostFoundItem.location} onChange={(e) => setLostFoundItem({ ...lostFoundItem, location: e.target.value })} />
+                  <input type="date" value={lostFoundItem.date} onChange={(e) => setLostFoundItem({ ...lostFoundItem, date: e.target.value })} />
+                  <input type="text" placeholder="Contact Info" value={lostFoundItem.contactInfo} onChange={(e) => setLostFoundItem({ ...lostFoundItem, contactInfo: e.target.value })} />
                   <input type="file" accept="image/*" multiple onChange={async (e) => {
                     const files = Array.from(e.target.files);
                     const imagePromises = files.map(file => {
@@ -1900,10 +1928,10 @@ function App() {
               {showMarketForm && (
                 <div className="form-container">
                   <h3>List an Item for Sale</h3>
-                  <input type="text" placeholder="Item Title" value={marketItem.title} onChange={(e) => setMarketItem({...marketItem, title: e.target.value})} />
-                  <textarea placeholder="Description" value={marketItem.description} onChange={(e) => setMarketItem({...marketItem, description: e.target.value})} />
-                  <input type="number" placeholder="Price (R)" value={marketItem.price} onChange={(e) => setMarketItem({...marketItem, price: e.target.value})} />
-                  <select value={marketItem.category} onChange={(e) => setMarketItem({...marketItem, category: e.target.value})}>
+                  <input type="text" placeholder="Item Title" value={marketItem.title} onChange={(e) => setMarketItem({ ...marketItem, title: e.target.value })} />
+                  <textarea placeholder="Description" value={marketItem.description} onChange={(e) => setMarketItem({ ...marketItem, description: e.target.value })} />
+                  <input type="number" placeholder="Price (R)" value={marketItem.price} onChange={(e) => setMarketItem({ ...marketItem, price: e.target.value })} />
+                  <select value={marketItem.category} onChange={(e) => setMarketItem({ ...marketItem, category: e.target.value })}>
                     <option>Electronics</option>
                     <option>Textbooks</option>
                     <option>Clothing</option>
@@ -1911,14 +1939,14 @@ function App() {
                     <option>Services</option>
                     <option>Other</option>
                   </select>
-                  <select value={marketItem.condition} onChange={(e) => setMarketItem({...marketItem, condition: e.target.value})}>
+                  <select value={marketItem.condition} onChange={(e) => setMarketItem({ ...marketItem, condition: e.target.value })}>
                     <option>New</option>
                     <option>Like New</option>
                     <option>Good</option>
                     <option>Fair</option>
                     <option>Poor</option>
                   </select>
-                  <input type="text" placeholder="Contact Info" value={marketItem.contactInfo} onChange={(e) => setMarketItem({...marketItem, contactInfo: e.target.value})} />
+                  <input type="text" placeholder="Contact Info" value={marketItem.contactInfo} onChange={(e) => setMarketItem({ ...marketItem, contactInfo: e.target.value })} />
                   <input type="file" accept="image/*" multiple onChange={async (e) => {
                     const files = Array.from(e.target.files);
                     const imagePromises = files.map(file => {
@@ -1979,8 +2007,8 @@ function App() {
               {showThreadForm && (
                 <div className="form-container">
                   <h3>Create Study Thread</h3>
-                  <input type="text" placeholder="Thread Title" value={examThread.title} onChange={(e) => setExamThread({...examThread, title: e.target.value})} />
-                  <textarea placeholder="Your Question" value={examThread.question} onChange={(e) => setExamThread({...examThread, question: e.target.value})} />
+                  <input type="text" placeholder="Thread Title" value={examThread.title} onChange={(e) => setExamThread({ ...examThread, title: e.target.value })} />
+                  <textarea placeholder="Your Question" value={examThread.question} onChange={(e) => setExamThread({ ...examThread, question: e.target.value })} />
                   <input type="file" accept="image/*" onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
@@ -2064,11 +2092,11 @@ function App() {
                 <button className="icon-btn-small" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>😀</button>
                 <button className="icon-btn-small" onClick={() => fileInputRef.current.click()}>📎</button>
                 <button className={`icon-btn-small ${recordingVoice ? 'recording' : ''}`} onClick={recordingVoice ? stopVoiceRecording : startVoiceRecording}>{recordingVoice ? '⏹️' : '🎤'}</button>
-                <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{display: 'none'}} />
+                <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} />
                 <button className="send-button" onClick={sendRoomMessage}>Send</button>
               </div>
               {showEmojiPicker && (
-                <div className="emoji-picker-large">
+                <div className="emoji-picker">
                   {emojis.map(emoji => (
                     <button key={emoji} className="emoji-btn" onClick={() => addEmoji(emoji)}>{emoji}</button>
                   ))}
@@ -2102,9 +2130,9 @@ function App() {
               {showResourceForm && (
                 <div className="form-container">
                   <h3>Share Study Resource</h3>
-                  <input type="text" placeholder="Resource Title" value={studyResource.title} onChange={(e) => setStudyResource({...studyResource, title: e.target.value})} />
-                  <textarea placeholder="Description" value={studyResource.description} onChange={(e) => setStudyResource({...studyResource, description: e.target.value})} />
-                  <select value={studyResource.subject} onChange={(e) => setStudyResource({...studyResource, subject: e.target.value})}>
+                  <input type="text" placeholder="Resource Title" value={studyResource.title} onChange={(e) => setStudyResource({ ...studyResource, title: e.target.value })} />
+                  <textarea placeholder="Description" value={studyResource.description} onChange={(e) => setStudyResource({ ...studyResource, description: e.target.value })} />
+                  <select value={studyResource.subject} onChange={(e) => setStudyResource({ ...studyResource, subject: e.target.value })}>
                     <option>Mathematics</option>
                     <option>Physical Sciences</option>
                     <option>Life Sciences</option>
@@ -2112,7 +2140,7 @@ function App() {
                     <option>Computer Science</option>
                     <option>Other</option>
                   </select>
-                  <select value={studyResource.gradeLevel} onChange={(e) => setStudyResource({...studyResource, gradeLevel: e.target.value})}>
+                  <select value={studyResource.gradeLevel} onChange={(e) => setStudyResource({ ...studyResource, gradeLevel: e.target.value })}>
                     <option>First Year</option>
                     <option>Second Year</option>
                     <option>Third Year</option>
@@ -2121,7 +2149,7 @@ function App() {
                     <option>Masters</option>
                     <option>PhD</option>
                   </select>
-                  <select value={studyResource.fileType} onChange={(e) => setStudyResource({...studyResource, fileType: e.target.value})}>
+                  <select value={studyResource.fileType} onChange={(e) => setStudyResource({ ...studyResource, fileType: e.target.value })}>
                     <option>PDF</option>
                     <option>DOC</option>
                     <option>DOCX</option>
@@ -2130,14 +2158,14 @@ function App() {
                     <option>Image</option>
                     <option>Other</option>
                   </select>
-                  <input type="text" placeholder="Tags (comma separated)" value={studyResource.tags} onChange={(e) => setStudyResource({...studyResource, tags: e.target.value})} />
+                  <input type="text" placeholder="Tags (comma separated)" value={studyResource.tags} onChange={(e) => setStudyResource({ ...studyResource, tags: e.target.value })} />
                   <input type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*" onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
                       const reader = new FileReader();
                       reader.onload = () => {
                         setResourceFile(reader.result);
-                        setStudyResource({...studyResource, fileName: file.name, fileSize: (file.size / 1024).toFixed(2) + ' KB'});
+                        setStudyResource({ ...studyResource, fileName: file.name, fileSize: (file.size / 1024).toFixed(2) + ' KB' });
                       };
                       reader.readAsDataURL(file);
                     }
@@ -2176,7 +2204,7 @@ function App() {
                 <div className="ndivho-ai-panel">
                   <div className="ndivho-ai-header">
                     <div className="ndivho-ai-avatar">
-                      <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%'}} />
+                      <img src="/images/ndivho-avatar.jpg" alt="Ndivho" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                     </div>
                     <div className="ndivho-ai-info">
                       <h3>Ndivho AI</h3>
@@ -2192,7 +2220,7 @@ function App() {
                         </div>
                         <div className="ndivho-ai-message-content">
                           <p>{msg.text}</p>
-                          <span className="ndivho-ai-time">{new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                          <span className="ndivho-ai-time">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>
                     ))}
@@ -2206,16 +2234,16 @@ function App() {
                     )}
                   </div>
                   <div className="ndivho-ai-quick-actions">
-                    <button onClick={() => {}}>📚 Study</button>
-                    <button onClick={() => {}}>📝 Exam</button>
-                    <button onClick={() => {}}>⏰ Time</button>
-                    <button onClick={() => {}}>💪 Motivation</button>
-                    <button onClick={() => {}}>💻 IT</button>
-                    <button onClick={() => {}}>⚖️ Law</button>
+                    <button onClick={() => { }}>📚 Study</button>
+                    <button onClick={() => { }}>📝 Exam</button>
+                    <button onClick={() => { }}>⏰ Time</button>
+                    <button onClick={() => { }}>💪 Motivation</button>
+                    <button onClick={() => { }}>💻 IT</button>
+                    <button onClick={() => { }}>⚖️ Law</button>
                   </div>
                   <div className="ndivho-ai-input-area">
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       value={ndivhoInput}
                       onChange={(e) => setNdivhoInput(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && sendToNdivhoAI()}
@@ -2271,11 +2299,13 @@ function App() {
                 <input type="file" accept="image/*" onChange={handleAvatarUpload} id="avatar-input" className="file-input-hidden" />
                 <label htmlFor="avatar-input" className="change-avatar-btn">Change Photo</label>
               </div>
-              <div className="form-section"><label>Display Name</label><input type="text" value={editProfile.displayName} onChange={(e) => setEditProfile({...editProfile, displayName: e.target.value})} /></div>
-              <div className="form-section"><label>Bio</label><textarea value={editProfile.bio} onChange={(e) => setEditProfile({...editProfile, bio: e.target.value})} rows="3" /></div>
-              <div className="form-section"><label>Level of Study</label><select value={editProfile.levelOfStudy} onChange={(e) => setEditProfile({...editProfile, levelOfStudy: e.target.value})}><option>First Year</option><option>Second Year</option><option>Third Year</option><option>Fourth Year</option><option>Honours</option><option>Masters</option><option>PhD</option></select></div>
-              <div className="form-section"><label>Degree Name</label><input type="text" value={editProfile.degreeName} onChange={(e) => setEditProfile({...editProfile, degreeName: e.target.value})} placeholder="e.g., BSc Computer Science" /></div>
-              <div className="form-section"><label>Faculty</label><select value={editProfile.faculty} onChange={(e) => setEditProfile({...editProfile, faculty: e.target.value})}><option value="">Select Faculty</option><option>Agriculture, Science & Engineering</option><option>Commerce, Law & Management</option><option>Humanities, Social Sciences & Education</option><option>Health Sciences</option></select></div>
+              <div className="form-section"><label>Display Name</label><input type="text" value={editProfile.displayName} onChange={(e) => setEditProfile({ ...editProfile, displayName: e.target.value })} /></div>
+              <div className="form-section"><label>Email</label><input type="email" value={editProfile.email} onChange={(e) => setEditProfile({ ...editProfile, email: e.target.value })} /></div>
+              <div className="form-section"><label>Phone</label><input type="tel" value={editProfile.phone} onChange={(e) => setEditProfile({ ...editProfile, phone: e.target.value })} /></div>
+              <div className="form-section"><label>Bio</label><textarea value={editProfile.bio} onChange={(e) => setEditProfile({ ...editProfile, bio: e.target.value })} rows="3" /></div>
+              <div className="form-section"><label>Level of Study</label><select value={editProfile.levelOfStudy} onChange={(e) => setEditProfile({ ...editProfile, levelOfStudy: e.target.value })}><option>First Year</option><option>Second Year</option><option>Third Year</option><option>Fourth Year</option><option>Honours</option><option>Masters</option><option>PhD</option></select></div>
+              <div className="form-section"><label>Degree Name</label><input type="text" value={editProfile.degreeName} onChange={(e) => setEditProfile({ ...editProfile, degreeName: e.target.value })} placeholder="e.g., BSc Computer Science" /></div>
+              <div className="form-section"><label>Faculty</label><select value={editProfile.faculty} onChange={(e) => setEditProfile({ ...editProfile, faculty: e.target.value })}><option value="">Select Faculty</option><option>Agriculture, Science & Engineering</option><option>Commerce, Law & Management</option><option>Humanities, Social Sciences & Education</option><option>Health Sciences</option></select></div>
               <button className="btn-primary btn-save" onClick={updateProfile}>Save Profile</button>
             </div>
           </div>

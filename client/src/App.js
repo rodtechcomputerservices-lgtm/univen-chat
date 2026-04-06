@@ -150,7 +150,7 @@ function App() {
   const [contactsMatch, setContactsMatch] = useState([]);
   const [showContactSync, setShowContactSync] = useState(false);
   
-  // Extended Emojis (50+)
+  // Extended Emojis (250+)
   const emojis = [
     "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
     "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
@@ -959,33 +959,33 @@ function App() {
     return reactions.join(' ');
   };
 
-  // Ndivho AI Functions
- const sendToAI = async () => {
-  if (!aiInput.trim()) return;
-  const userMessage = aiInput.trim();
-  setAiMessages(prev => [...prev, { sender: 'user', text: userMessage, timestamp: new Date() }]);
-  setAiInput("");
-  setIsAiTyping(true);
-  try {
-    const response = await fetch('https://univen-chat.onrender.com/api/ndivho-ai/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: userMessage, userId, moduleCode: aiModuleCode })
-    });
-    const data = await response.json();
-    setTimeout(() => {
-      setAiMessages(prev => [...prev, { sender: 'bot', text: data.response, timestamp: data.timestamp }]);
-      setIsAiTyping(false);
-    }, 1000);
-  } catch (error) {
-    console.error('Error:', error);
-    setAiMessages(prev => [...prev, { sender: 'bot', text: "Sorry, I'm having trouble connecting. Please try again.", timestamp: new Date() }]);
-    setIsAiTyping(false);
-  }
-};
+  // === NDIVHO AI FUNCTIONS (FIXED) ===
+  const sendToNdivhoAI = async () => {
+    if (!ndivhoInput.trim()) return;
+    const userMessage = ndivhoInput.trim();
+    setNdivhoMessages(prev => [...prev, { sender: 'user', text: userMessage, timestamp: new Date() }]);
+    setNdivhoInput("");
+    setIsAITyping(true);
+    try {
+      const response = await fetch('https://univen-chat.onrender.com/api/ndivho-ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage })
+      });
+      const data = await response.json();
+      setTimeout(() => {
+        setNdivhoMessages(prev => [...prev, { sender: 'bot', text: data.response, timestamp: data.timestamp }]);
+        setIsAITyping(false);
+      }, 1000);
+    } catch (error) {
+      console.error('Error:', error);
+      setNdivhoMessages(prev => [...prev, { sender: 'bot', text: "Sorry, I'm having trouble connecting. Please try again.", timestamp: new Date() }]);
+      setIsAITyping(false);
+    }
+  };
 
-  // AI Room Functions
-  
+  // === AI ROOM FUNCTIONS (FIXED) ===
+  const sendToAI = async () => {
     if (!aiInput.trim()) return;
     const userMessage = aiInput.trim();
     setAiMessages(prev => [...prev, { sender: 'user', text: userMessage, timestamp: new Date() }]);
@@ -997,13 +997,14 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage, userId, moduleCode: aiModuleCode })
       });
-      const const sendToAI = async () => {data = await response.json();
+      const data = await response.json();
       setTimeout(() => {
         setAiMessages(prev => [...prev, { sender: 'bot', text: data.response, timestamp: data.timestamp }]);
         setIsAiTyping(false);
       }, 1000);
     } catch (error) {
       console.error('Error:', error);
+      setAiMessages(prev => [...prev, { sender: 'bot', text: "Sorry, I'm having trouble connecting. Please try again.", timestamp: new Date() }]);
       setIsAiTyping(false);
     }
   };
